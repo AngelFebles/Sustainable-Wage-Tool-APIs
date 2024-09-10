@@ -15,8 +15,15 @@ headers = {
 response = requests.get(url, headers=headers)
 
 if response.status_code == 200:
-    data = response.json()
-    print(data.get('data').get('basicdata'))
+    data = response.json().get('data').get('basicdata')
+
+    housingEfficiency = data.get('Efficiency')
+    housingOneBedroom = data.get('One-Bedroom')
+    housingTwoBedroom = data.get('Two-Bedroom')
+    housingThreeBedroom = data.get('Three-Bedroom')
+    housingFourBedroom = data.get('Four-Bedroom')
+    
+    print(data)
 else:
     print('API request failed with status code:', response.status_code)
 
