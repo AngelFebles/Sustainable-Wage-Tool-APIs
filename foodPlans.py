@@ -47,24 +47,64 @@ def getThriftyTable(linkToThriftyPlan):
         first_page = pdf.pages[0]
         tables = first_page.extract_tables()
     
-    thirftyTableGroup1 =  splitGroupList(tables[0][1][0])
-    thirftyTableWeeklySingle =  splitCostList(tables[0][1][1])
-    thirftyTableMonthlySingle = splitCostList(tables[0][1][2])
+    thirftyTableGroupSingle = splitGroupList1(tables[0][1][0])
+    thirftyTableWeeklySingle = splitCostList1(tables[0][1][1])
+    thirftyTableMonthlySingle = splitCostList1(tables[0][1][2])
+
+
     
-    thirftyTableGroup2 = tables[0][2][0]
-    thirftyTableWeeklyFamily = splitCostList(tables[0][2][1])
-    thirftyTableMonthlyFamily = splitCostList(tables[0][2][2])
+    # Index 0 is the header, 1 is the weekly cost, 2 is monthly cost
     
-    print(thirftyTableGroup1)
+
+    #print(food_plan_costs_single)
+  
     
-def splitCostList(numberList):
+    thirftyTableGroupFamily = tables[0][2][0]
+    thirftyTableWeeklyFamily = splitCostList2(tables[0][2][1])
+    thirftyTableMonthlyFamily = splitCostList2(tables[0][2][2])
+    
+    # Index 0 is the header, 1 is the weekly cost, 2 is monthly cost
+    #food_plan_costs_family = [thirftyTableGroupFamily, thirftyTableWeeklyFamily, thirftyTableMonthlyFamily]
+    #  print(food_plan_costs_family)
+    
+    #print(thirftyTableMonthlyFamily)
+    
+def splitCostList1(numberList):
     values = numberList.replace('$', '').split('\n')
     float_values = [float(value) for value in values]
     
-    return float_values 
+    # Split the values into groups: Child, Male, Female
+    child_values = float_values[0:5]
+    male_values = float_values[5:10]
+    female_values = float_values[10:]
+    
+    food_plan_costs = [child_values,male_values,female_values]
+    
+    
+    return food_plan_costs 
 
-def splitGroupList(groupList):
+def splitCostList2(numberList):
+    values = numberList.replace('$', '').split('\n')
+    float_values = [float(value) for value in values]
+    
+    return float_values
+
+def splitGroupList1(groupList):
     values = groupList.split('\n')
-    return values
+    
+    #Remove the "Individual" label
+    values = values[1:]
+    
+    # Split the values into groups: Child, Male, Female
+    child_values = values[1:6]
+    male_values = values[7:12]
+    female_values = values[13:]
+
+    # Create a 2D array
+    food_plan_header = [child_values, male_values, female_values]
+
+    return food_plan_header
+    
+
     
 main()
