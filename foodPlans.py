@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
 import io
-import PyPDF2
 import pdfplumber
 
 #This script will scrape the USDA website for the most recent food plans and return the monthly cost of each plan

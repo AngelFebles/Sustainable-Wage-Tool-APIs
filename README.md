@@ -19,7 +19,8 @@ requests
 ```
 pip install requests
 ```
-PyPDF2
+pdfplumber
+
 ```
-pip install PyPDF2
+pip install pdfplumber
 ```
