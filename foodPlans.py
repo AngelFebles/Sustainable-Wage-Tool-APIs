@@ -35,11 +35,8 @@ def main():
 
 
 
-
-
-
 def getThriftyTable(linkToThriftyPlan):
-    #Thirfty plan to rar text
+    #Thirfty plan to raw text
     rPDF = requests.get(linkToThriftyPlan)
     f = io.BytesIO(rPDF.content)
     
@@ -51,9 +48,17 @@ def getThriftyTable(linkToThriftyPlan):
     thirftyTableWeeklySingle = splitCostList1(tables[0][1][1])
     thirftyTableMonthlySingle = splitCostList1(tables[0][1][2])
 
+    # food_plan_costs_single returns a value [x,y,z] where: x is the age-sex group, y is the weekly cost, and z is monthly cost
+    food_plan_costs_single = []
+    for i in range(len(thirftyTableGroupSingle)):
+        group = thirftyTableGroupSingle[i]
+        week = thirftyTableWeeklySingle[i]
+        month = thirftyTableMonthlySingle[i]
+        food_plan_costs_single.append([group, week, month])
 
+    print(food_plan_costs_single[3])
     
-    # Index 0 is the header, 1 is the weekly cost, 2 is monthly cost
+
     
 
     #print(food_plan_costs_single)
@@ -72,16 +77,8 @@ def getThriftyTable(linkToThriftyPlan):
 def splitCostList1(numberList):
     values = numberList.replace('$', '').split('\n')
     float_values = [float(value) for value in values]
-    
-    # Split the values into groups: Child, Male, Female
-    child_values = float_values[0:5]
-    male_values = float_values[5:10]
-    female_values = float_values[10:]
-    
-    food_plan_costs = [child_values,male_values,female_values]
-    
-    
-    return food_plan_costs 
+        
+    return float_values 
 
 def splitCostList2(numberList):
     values = numberList.replace('$', '').split('\n')
@@ -101,7 +98,7 @@ def splitGroupList1(groupList):
     female_values = values[13:]
 
     # Create a 2D array
-    food_plan_header = [child_values, male_values, female_values]
+    food_plan_header = child_values+male_values+female_values
 
     return food_plan_header
     
