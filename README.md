@@ -1,0 +1,18 @@
+This repository contains scripts that automatically retrieve information from the most recent sources for the Sustainable Wage Tool.
+
+Needed python packages to run:
+
+BeautifulSoup
+```
+pip install beautifulsoup4
+```
+
+requests
+
+```
+pip install requests
+```
+PyPDF2
+```
+pip install PyPDF2
+```
