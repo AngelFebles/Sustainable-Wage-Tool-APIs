@@ -26,6 +26,14 @@ def main():
 
     #Links to the most recent food plans
     linkToThriftyPlan = f"https://www.fns.usda.gov{thriftyPlanRaw['href']}"
+
+    '''
+    getThriftyTable returns a 3D array such that:
+    Index 0 is a 2D array of the child values
+    Index 1 is a 2D array of the male values
+    Index 2 is a 2D array of female values
+    Index 3 is a 2D array of the reference family values 
+    '''
     getThriftyTable(linkToThriftyPlan)
     
     
@@ -54,28 +62,26 @@ def getThriftyTable(linkToThriftyPlan):
         week = thirftyTableWeeklySingle[i]
         month = thirftyTableMonthlySingle[i]
         thrifty_plan_costs_single.append([group, week, month])
-
-#    print(thrifty_plan_costs_single[3])
     
       # Split the values into groups: Child, Male, Female
     child_values = thrifty_plan_costs_single[0:5]
     male_values = thrifty_plan_costs_single[5:10]
-    female_values = thrifty_plan_costs_single[10:]
+    female_values = thrifty_plan_costs_single[10:]  
     
-    thrifty_divided = [child_values + male_values + female_values]
-
-    print(thrifty_divided)
-  
-    
-    thirftyTableGroupFamily = tables[0][2][0]
+    #thirftyTableGroupFamily = tables[0][2][0]
     thirftyTableWeeklyFamily = splitCostList2(tables[0][2][1])
     thirftyTableMonthlyFamily = splitCostList2(tables[0][2][2])
     
     # Index 0 is the header, 1 is the weekly cost, 2 is monthly cost
-    #food_plan_costs_family = [thirftyTableGroupFamily, thirftyTableWeeklyFamily, thirftyTableMonthlyFamily]
-    #  print(food_plan_costs_family)
+    food_plan_costs_family = ['Reference Family', thirftyTableWeeklyFamily, thirftyTableMonthlyFamily]
     
-    #print(thirftyTableMonthlyFamily)
+
+    
+    thrifty_divided =  [child_values, male_values ,female_values, food_plan_costs_family ]
+
+    return thrifty_divided
+
+
     
 def splitCostList1(numberList):
     values = numberList.replace('$', '').split('\n')
@@ -95,13 +101,15 @@ def splitGroupList1(groupList):
     #Remove the "Individual" label
     values = values[1:]
     
-    # Removing headers (Child, Male, Female)
-    child_values = values[1:6]
-    male_values = values[7:12]
-    female_values = values[13:]
+    # Adding headers (Child, Male, Female)
+    child_ages = [f"child {value}" for value in values[1:6]]
+    male_ages = [f"male {value}" for value in values[7:12]]
+    female_ages = [f"female {value}" for value in values[13:]]
+
+ 
 
     # Create a 2D array
-    food_plan_header = child_values+male_values+female_values
+    food_plan_header = child_ages+male_ages+female_ages
 
     return food_plan_header
     
