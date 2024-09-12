@@ -48,19 +48,23 @@ def getThriftyTable(linkToThriftyPlan):
     thirftyTableMonthlySingle = splitCostList1(tables[0][1][2])
 
     # food_plan_costs_single returns a value [x,y,z] where: x is the age-sex group, y is the weekly cost, and z is monthly cost
-    food_plan_costs_single = []
+    thrifty_plan_costs_single = []
     for i in range(len(thirftyTableGroupSingle)):
         group = thirftyTableGroupSingle[i]
         week = thirftyTableWeeklySingle[i]
         month = thirftyTableMonthlySingle[i]
-        food_plan_costs_single.append([group, week, month])
+        thrifty_plan_costs_single.append([group, week, month])
 
-    print(food_plan_costs_single[3])
+#    print(thrifty_plan_costs_single[3])
     
-
+      # Split the values into groups: Child, Male, Female
+    child_values = thrifty_plan_costs_single[0:5]
+    male_values = thrifty_plan_costs_single[5:10]
+    female_values = thrifty_plan_costs_single[10:]
     
+    thrifty_divided = [child_values + male_values + female_values]
 
-    #print(food_plan_costs_single)
+    print(thrifty_divided)
   
     
     thirftyTableGroupFamily = tables[0][2][0]
@@ -91,7 +95,7 @@ def splitGroupList1(groupList):
     #Remove the "Individual" label
     values = values[1:]
     
-    # Split the values into groups: Child, Male, Female
+    # Removing headers (Child, Male, Female)
     child_values = values[1:6]
     male_values = values[7:12]
     female_values = values[13:]
