@@ -1,13 +1,13 @@
 import requests
+import credentials
 
-APIKEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI2IiwianRpIjoiN2EwOGVjZWQyOTc4NGUzNGE3YzNiNWU0YjgyZTEyMWJlYzk3MzZhMmM5YjExMDRjM2Q0NjQ1NDFiZjBmMTM4MDMzMGE3ZjMxNmNjYjNiZGQiLCJpYXQiOjE3MjU1NjA2OTUuOTY3NDUxLCJuYmYiOjE3MjU1NjA2OTUuOTY3NDUzLCJleHAiOjIwNDEwOTM0OTUuOTYyNjAzLCJzdWIiOiI3NzI3MyIsInNjb3BlcyI6W119.PC5tJhuUKPf0LDMADlgADvWzJR16y2xTWOi-S2pWUrBy25P3fMWQTabtuPe8xKfYzuxApEYv8wvVbBHHdPt8yQ'
 countyCode = '5510199999'  # Racine, WI MSA
 
 #FY Racine, WI MSA FMTs for All Bedroom Sizes
 url = f'https://www.huduser.gov/hudapi/public/fmr/data/{countyCode}'
 
 headers = {
-    'Authorization': f'Bearer {APIKEY}'
+    'Authorization': f'Bearer {credentials.APIKEYHOUSING}'
 }
 
 response = requests.get(url, headers=headers)
