@@ -6,21 +6,8 @@ Housing Cost API: https://www.huduser.gov/portal/dataset/fmr-api.html
 
 Food Plan List: https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports
 
-
-Needed python packages to run:
-
-BeautifulSoup
-```
-pip install beautifulsoup4
-```
-
-requests
+Before running the scripts, make sure to install the required packages. Run this command in the project's root folder:
 
 ```
-pip install requests
-```
-pdfplumber
-
-```
-pip install pdfplumber
+pip install -r requirements.txt
 ```
