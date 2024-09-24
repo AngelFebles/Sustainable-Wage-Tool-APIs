@@ -24,3 +24,9 @@ pdfplumber
 ```
 pip install pdfplumber
 ```
+
+polars
+
+```
+pip install polars
+```
