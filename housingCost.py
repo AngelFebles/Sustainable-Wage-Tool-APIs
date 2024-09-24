@@ -1,5 +1,7 @@
 import requests
 import credentials
+import polars as pl
+
 
 countyCode = '5510199999'  # Racine, WI MSA
 
@@ -14,14 +16,16 @@ response = requests.get(url, headers=headers)
 
 if response.status_code == 200:
     data = response.json().get('data').get('basicdata')
+    df = pl.DataFrame({
+        'Efficiency': [data.get('Efficiency')],
+        'One-Bedroom': [data.get('One-Bedroom')],
+        'Two-Bedroom': [data.get('Two-Bedroom')],
+        'Three-Bedroom': [data.get('Three-Bedroom')],
+        'Four-Bedroom': [data.get('Four-Bedroom')]
+    })
 
-    housingEfficiency = data.get('Efficiency')
-    housingOneBedroom = data.get('One-Bedroom')
-    housingTwoBedroom = data.get('Two-Bedroom')
-    housingThreeBedroom = data.get('Three-Bedroom')
-    housingFourBedroom = data.get('Four-Bedroom')
     
-    print(data)
+    print(df)
 else:
     print('API request failed with status code:', response.status_code)
 
