@@ -44,13 +44,18 @@ def main():
 def readFile(file_path):
     print('Reading the file...')
     # Read the Excel file using polars
+    #df = pl.read_excel(file_path, sheet_name='By County')
     df = pl.read_excel(file_path, sheet_name='By County')
+
+    # 52 is Racine's county number in spreadsheet, 1 is a constant offset
+    offset = 52+1
+
+    print(df[1335-offset])
 
     # Print the row at index 1335
 
-    print(df[0])
-
-
+    #print(df[1335])
+    
     
 
 
