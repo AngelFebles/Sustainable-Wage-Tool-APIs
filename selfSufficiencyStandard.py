@@ -45,20 +45,26 @@ def readFile(file_path):
     print('Reading the file...')
     # Read the Excel file using polars
     #df = pl.read_excel(file_path, sheet_name='By County')
-    df = pl.read_excel(file_path, sheet_name='By County')
+    df = pl.read_excel(file_path, sheet_name='By County').with_row_index(name='index')
 
     # 52 is Racine's county number in spreadsheet, 1 is a constant offset
-    offset = 52+1
+    # offset = 52+1
+    # print(df[1335-offset])
 
-    print(df[1335-offset])
-
-    # Print the row at index 1335
-
-    #print(df[1335])
+    # Get the id of the row that contains Racine County
+    county_row = df.filter(pl.col(df.columns[1]).str.contains('Racine County'))
+    county_index = county_row.select(pl.first()).row(0)[0]
     
+    #After County header, there's 8 rows of padding before the first data row (Thats why first row in table is county_index+8)
+    #Then there's 12 rows of data (thats why last row in table is county_index+20)
     
+    monthlyCosts = df[county_index+8:county_index+20]
+    
+    selfSufficiencyWages = df[county_index+21:county_index+24]
+    
+    emergencySavings = df[county_index+24]
 
-
+        
 main()
  
 
