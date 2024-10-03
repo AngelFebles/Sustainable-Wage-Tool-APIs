@@ -62,8 +62,16 @@ def foodPlansmain():
   
     '''
     #print(thrifthy_plan)
+    
+    
+    
+    
+    df = fuse_food_plans(thrifthy_plan, low_to_lib_plan)
     print('Done!')
-    return thrifthy_plan
+    
+    #print(low_to_lib_plan)
+    
+    return df
 
 
  
@@ -85,11 +93,17 @@ def getThriftyTable(linkToThriftyPlan):
     thirftyTableWeeklyFamily = splitCostList1(tables[0][2][1])
     thirftyTableMonthlyFamily = splitCostList1(tables[0][2][2])
     
-    
+    #ageGroups = ['Child'] * 5 + ["Male"] * 5 + ["Female"] * 5 + ["Family"]
+      
     thrifty_df = pl.DataFrame({
-        'Age-sex group' : thirftyTableGroupSingle + ['Reference Family'],
-        'Weekly cost' : thirftyTableWeeklySingle + thirftyTableWeeklyFamily,
-        'Monthly cost' : thirftyTableMonthlySingle + thirftyTableMonthlyFamily
+        # 'Cohorts': ageGroups,
+        # 'Age' : thirftyTableGroupSingle + ['Reference Family'],
+        # 'Weekly cost' : thirftyTableWeeklySingle + thirftyTableWeeklyFamily,
+        # 'Monthly cost' : thirftyTableMonthlySingle + thirftyTableMonthlyFamily
+        
+        'Age' : thirftyTableGroupSingle ,
+        'Weekly cost' : thirftyTableWeeklySingle ,
+        'Monthly cost' : thirftyTableMonthlySingle
     })
 
 
@@ -113,15 +127,15 @@ def getLowLiberalTable(linkToLowLiberalPlan):
     monthly_moderate = splitCostList1(tables[0][1][5])
     monthly_liberal = splitCostList1(tables[0][1][6])
 
-
+    
     low_to_liberaldf = pl.DataFrame({
-        'Age-sex group': age_gender_groups,
+        'Age': age_gender_groups,
         'Weekly cost low': weekly_low,
         'Weekly cost moderate': weekly_moderate,
         'Weekly cost liberal': weekly_liberal,
         'Monthly cost low': monthly_low,
         'Monthly cost moderate': monthly_moderate,
-        'Monthly cosr liberal': monthly_liberal
+        'Monthly cost liberal': monthly_liberal
     })
 
     return low_to_liberaldf
@@ -138,20 +152,44 @@ def splitCostList1(numberList):
 
 def splitGroupList1(groupList):
     values = groupList.split('\n')
-    
+        
     #Remove the "Individual" label
     values = values[1:]
     
-    # Adding headers (Child, Male, Female)
-    child_ages = [f"child {value}" for value in values[1:6]]
-    male_ages = [f"male {value}" for value in values[7:12]]
-    female_ages = [f"female {value}" for value in values[13:]]
+    # removing headers (Child, Male, Female)
+    child_ages = values[1:6]
+    male_ages = values[7:12]
+    female_ages = values[13:]
 
     # Create a 2D array
     food_plan_header = child_ages+male_ages+female_ages
 
     return food_plan_header
+
+
+def fuse_food_plans(thrifthy_plan, low_to_lib_plan):
     
+    ageGroups = ['Child'] * 5 + ["Male"] * 5 + ["Female"] * 5
+    categories = ["Infant", "Preschooler", "Preschooler", "School Age", "School Age", "School Age", "Teenager", "Adult", "Senior", "Senior", "School Age", "Teenager", "Adult", "Senior", "Senior"]
 
     
+    
+    #print(low_to_lib_plan)
+        
+    fusedDF = pl.DataFrame({
+        'Cohorts': ageGroups,
+        'Age': low_to_lib_plan["Age"],
+        'Age Cohort': categories,
+        'Thrifty Monthly' : thrifthy_plan["Monthly cost"],
+        'Low Monthly' : low_to_lib_plan["Monthly cost low"],
+        'Moderate Monthly' : low_to_lib_plan["Monthly cost moderate"],
+        'Liberal Monthly' : low_to_lib_plan["Monthly cost liberal"]
+    })
+    
+    #print(fusedDF)
+    
+    return fusedDF
+
+    
+
 #foodPlansmain()

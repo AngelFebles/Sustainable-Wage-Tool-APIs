@@ -6,7 +6,7 @@ import polars as pl
 def housingCostMain():
 
     df = ''
-    
+    year = 0
     countyCode = '5510199999'  # Racine, WI MSA
 
     #FY Racine, WI MSA FMTs for All Bedroom Sizes
@@ -29,11 +29,16 @@ def housingCostMain():
             'Three-Bedroom': [data.get('Three-Bedroom')],
             'Four-Bedroom': [data.get('Four-Bedroom')]
         })
-
         
-        #print(df)
+        year = data.get('year')
+    
         
         print("Done!")
+        
+        df = df.transpose(include_header=True).with_row_index()
+        df = df.rename({"index": "Lookup", "column": "Type", "column_0": year})
+
+        #print(df)
         return df
        
     else:
