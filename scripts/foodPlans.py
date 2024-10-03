@@ -66,12 +66,13 @@ def foodPlansmain():
     
     
     
-    df = fuse_food_plans(thrifthy_plan, low_to_lib_plan)
+    fused_df = fuse_food_plans(thrifthy_plan, low_to_lib_plan)
+    #means_df = getAgeCohortMeans(fused_df)
     print('Done!')
     
     #print(low_to_lib_plan)
     
-    return df
+    return fused_df
 
 
  
@@ -185,12 +186,9 @@ def fuse_food_plans(thrifthy_plan, low_to_lib_plan):
         'Moderate Monthly' : low_to_lib_plan["Monthly cost moderate"],
         'Liberal Monthly' : low_to_lib_plan["Monthly cost liberal"]
     })
-
-
+    #print(fusedDF)
     
-    print(fusedDF)
-    
-    getAgeCohortMeans(fusedDF)
+    #meansDF = getAgeCohortMeans(fusedDF)
 
     return fusedDF
 
@@ -198,19 +196,16 @@ def getAgeCohortMeans(df):
 
     meansDF = pl.DataFrame({})
     categories = ["Infant", "Preschooler", "School Age", "Teenager", "Adult", "Senior"]
-    
+
     for category in categories:
         mean = df.filter(pl.col('Age Cohort') == category).select(['Age Cohort','Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', 'Liberal Monthly']).mean()
-
         meansDF = meansDF.vstack(mean)
-    
-   
-    
-    
-    print(meansDF)
-    
 
-    return df
+    meansDF = df.group_by('Age Cohort').agg(pl.col(['Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', 'Liberal Monthly']).mean())        
+   
+    #print(meansDF)
+
+    return meansDF
 
     
 
