@@ -3,7 +3,8 @@ import requests
 from bs4 import BeautifulSoup
 import os
 
-def main():
+def sssMain():
+    
     sssHomePage = 'https://selfsufficiencystandard.org/Wisconsin/'
     rSoup = requests.get(sssHomePage)
 
@@ -38,7 +39,9 @@ def main():
     else:
         print(f'{filename} already downloaded.')
 
-    readFile(file_path)
+   
+    
+    return readFile(file_path)
     
 
 def readFile(file_path):
@@ -63,9 +66,15 @@ def readFile(file_path):
     selfSufficiencyWages = df[county_index+21:county_index+24]
     
     emergencySavings = df[county_index+24]
+    
+    new_df = pl.concat([monthlyCosts, selfSufficiencyWages, emergencySavings], rechunk=True)    
+    
+    print(new_df)
+    
+    return new_df
 
         
-main()
+sssMain()
  
 
 

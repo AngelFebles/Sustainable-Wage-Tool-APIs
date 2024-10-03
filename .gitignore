@@ -4,5 +4,6 @@ tempCodeRunnerFile.py
 
 /rawFiles/*
 
+*dataOutput.xlsx
 
 __pycache__
