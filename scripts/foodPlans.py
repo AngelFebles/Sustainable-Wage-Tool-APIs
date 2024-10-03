@@ -3,12 +3,13 @@ import requests
 import io
 import pdfplumber
 import polars as pl
+import xlsxwriter
 
 
 #This script will scrape the USDA website for the most recent food plans and return the weekly and monthly cost of each plan
 
 
-def main():
+def foodPlansmain():
     foodPlansHomePage = 'https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports'
     rSoup = requests.get(foodPlansHomePage)
 
@@ -28,6 +29,7 @@ def main():
 
 
     #Links to most recent plan pdfs
+    
     linkToThriftyPlan = f"https://www.fns.usda.gov{thriftyPlanRaw['href']}"
     linkToLowLiberalPlan = f"https://www.fns.usda.gov{lowToLiberalPlanRaw['href']}"
 
@@ -35,10 +37,12 @@ def main():
 
     #Most recent food plan data
     #See comment below for more info
-    thrifthy_plan = getThriftyTable(linkToThriftyPlan)
+    print('Getting Food Plan Cost data....')
+    
+    thrifthy_plan = pl.DataFrame(getThriftyTable(linkToThriftyPlan))
     low_to_lib_plan = getLowLiberalTable(linkToLowLiberalPlan)
 
-
+    
 
     '''
     getThriftyTable and getLowLiberalTable return polars dataframes with the following columns:
@@ -57,6 +61,10 @@ def main():
         print(thrifthy_plan['Weekly cost'][0]) 
   
     '''
+    #print(thrifthy_plan)
+    print('Done!')
+    return thrifthy_plan
+
 
  
 
@@ -146,4 +154,4 @@ def splitGroupList1(groupList):
     
 
     
-main()
+#foodPlansmain()
