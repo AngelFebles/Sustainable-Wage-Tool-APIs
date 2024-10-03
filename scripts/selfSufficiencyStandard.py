@@ -39,8 +39,8 @@ def sssMain():
     else:
         print(f'{filename} already downloaded.')
 
-   
-    
+    #readFile(file_path)
+     
     return readFile(file_path)
     
 
@@ -48,33 +48,26 @@ def readFile(file_path):
     print('Reading the file...')
     # Read the Excel file using polars
     #df = pl.read_excel(file_path, sheet_name='By County')
-    df = pl.read_excel(file_path, sheet_name='By County').with_row_index(name='index')
+    df = pl.read_excel(file_path, sheet_name='By Family').with_row_index(name='index')
 
-    # 52 is Racine's county number in spreadsheet, 1 is a constant offset
-    # offset = 52+1
-    # print(df[1335-offset])
 
     # Get the id of the row that contains Racine County
-    county_row = df.filter(pl.col(df.columns[1]).str.contains('Racine County'))
+    county_row = df.filter(pl.col(df.columns[10]).str.contains('Racine County'))
     county_index = county_row.select(pl.first()).row(0)[0]
     
-    #After County header, there's 8 rows of padding before the first data row (Thats why first row in table is county_index+8)
-    #Then there's 12 rows of data (thats why last row in table is county_index+20)
+    #Theres 719 rows for each county, thats where the upperbound comes from
+    dataFrame = df[county_index:county_index+719]
     
-    monthlyCosts = df[county_index+8:county_index+20]
+    #To make the output cleaner, I deleted the index column
+    dataFrame = dataFrame.drop(dataFrame.columns[0])
+
     
-    selfSufficiencyWages = df[county_index+21:county_index+24]
-    
-    emergencySavings = df[county_index+24]
-    
-    new_df = pl.concat([monthlyCosts, selfSufficiencyWages, emergencySavings], rechunk=True)    
-    
-    print(new_df)
-    
-    return new_df
+    #print(dataFrame)
+
+    return dataFrame
 
         
-sssMain()
+#sssMain()
  
 
 
