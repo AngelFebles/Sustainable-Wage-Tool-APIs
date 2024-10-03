@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import os
 
 def sssMain():
-    
+    print('Getting Self Sufficiency Standard data....')
     sssHomePage = 'https://selfsufficiencystandard.org/Wisconsin/'
     rSoup = requests.get(sssHomePage)
 
@@ -63,6 +63,8 @@ def readFile(file_path):
 
     
     #print(dataFrame)
+
+    print('Done!')
 
     return dataFrame
 

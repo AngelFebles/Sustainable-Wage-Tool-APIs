@@ -193,7 +193,7 @@ def fuse_food_plans(thrifthy_plan, low_to_lib_plan):
     return fusedDF
 
 def getAgeCohortMeans(df):
-
+    print('Calculating food plan means...')
     meansDF = pl.DataFrame({})
     categories = ["Infant", "Preschooler", "School Age", "Teenager", "Adult", "Senior"]
 
@@ -204,9 +204,9 @@ def getAgeCohortMeans(df):
     meansDF = df.group_by('Age Cohort').agg(pl.col(['Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', 'Liberal Monthly']).mean())        
    
     #print(meansDF)
-
+    print('Done!')
     return meansDF
 
     
 
-foodPlansmain()
+#foodPlansmain()
