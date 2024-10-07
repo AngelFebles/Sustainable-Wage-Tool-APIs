@@ -195,13 +195,33 @@ def fuse_food_plans(thrifthy_plan, low_to_lib_plan):
 def getAgeCohortMeans(df):
     print('Calculating food plan means...')
     meansDF = pl.DataFrame({})
+    
+    #The default order of the intialage cohort rows is the one below, but we'll need to change it later to be compatible with the Self Sufficiency Standard
+    #Could change to doing the final order from the beggining but this makes it more readable
+    
     categories = ["Infant", "Preschooler", "School Age", "Teenager", "Adult", "Senior"]
 
+    
     for category in categories:
         mean = df.filter(pl.col('Age Cohort') == category).select(['Age Cohort','Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', 'Liberal Monthly']).mean()
         meansDF = meansDF.vstack(mean)
 
-    meansDF = df.group_by('Age Cohort').agg(pl.col(['Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', 'Liberal Monthly']).mean())        
+
+    meansDF = df.group_by('Age Cohort').agg(pl.col(['Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', 'Liberal Monthly']).mean())      
+    
+    
+    #Change the format of the columns to be compatible with the Self Sufficiency Standard
+    
+    #Pop Senior
+    meansDF = meansDF.filter(pl.col('Age Cohort') != 'Senior')
+    
+    #Make Adult the first row
+    adult_row = meansDF.filter(pl.col('Age Cohort') == 'Adult').select(pl.col('*'))
+    meansDF = meansDF.filter(pl.col('Age Cohort') != 'Adult')
+    
+    meansDF = pl.concat([adult_row, meansDF])
+
+      
    
     #print(meansDF)
     print('Done!')
