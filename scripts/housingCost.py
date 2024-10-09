@@ -36,7 +36,7 @@ def housingCostMain():
         print("Done!")
         
         df = df.transpose(include_header=True).with_row_index()
-        df = df.rename({"index": "Lookup", "column": "Type", "column_0": year})
+        df = df.rename({"index": "Lookup", "column": "Type", "column_0": "Cost"})
 
         #print(df)
         return df
