@@ -30,7 +30,7 @@ def monthlyBudgetMain(sssDf, housingDF,foodDF):
         pl.Series("Food Costs", getFoodCosts(len(monthlyBudgetDf)))
     ])
             
-    print(monthlyBudgetDf) 
+    #print(monthlyBudgetDf) 
         
     return monthlyBudgetDf
 
