@@ -12,7 +12,7 @@ food_plans_df = pl.DataFrame(foodPlansmain())
 food_plans_means_df = pl.DataFrame(getAgeCohortMeans(food_plans_df))
 self_sufficiency_standard_df = pl.DataFrame(sssMain())
 
-monthly_budget_df = pl.DataFrame(monthlyBudgetMain(self_sufficiency_standard_df,housing_cost_plan_df,food_plans_means_df))
+monthly_budget_df = pl.DataFrame(monthlyBudgetMain(self_sufficiency_standard_df,housing_cost_plan_df))
 
 
 

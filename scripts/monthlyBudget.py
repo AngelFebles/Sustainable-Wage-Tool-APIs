@@ -1,7 +1,7 @@
 import polars as pl
 
 
-def monthlyBudgetMain(sssDf, housingDF,foodDF):
+def monthlyBudgetMain(sssDf, housingDF):
     monthlyBudgetDf = pl.DataFrame()
     print('Getting Monthly Budget data....')
     
@@ -31,10 +31,10 @@ def monthlyBudgetMain(sssDf, housingDF,foodDF):
     ])
             
     #print(monthlyBudgetDf) 
+    
+    monthlyBudgetDf = getRestOfColumns(monthlyBudgetDf, sssDf)
         
     return monthlyBudgetDf
-
-
 
 def getFoodCosts(listLength):
 
@@ -47,5 +47,8 @@ def getFoodCosts(listLength):
             current_row += 1
 
     return foodCostsList
-    
 
+
+def getRestOfColumns(monthlyBudgetDf, sssDf):
+    
+    
