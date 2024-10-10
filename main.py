@@ -23,4 +23,4 @@ with xlsxwriter.Workbook("dataOutput.xlsx") as workbook:
     self_sufficiency_standard_df.write_excel(workbook=workbook,worksheet='Self_Sufficiency_Standard')
     food_plans_df.write_excel(workbook=workbook,worksheet='Food_lookup')
     food_plans_means_df.write_excel(workbook=workbook,worksheet='Food_means')    
-    monthly_budget_df.write_excel(workbook=workbook,worksheet='Monthly_Budget')
+    monthly_budget_df.write_excel(workbook=workbook,worksheet='Monthly Budget')
