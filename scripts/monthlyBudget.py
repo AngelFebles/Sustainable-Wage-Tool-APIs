@@ -7,6 +7,17 @@ def monthlyBudgetMain(sssDf, housingDF):
     
 
     initial_df = sssDf.select(pl.col(list(sssDf.columns)[:6])).fill_null(0)
+    initial_df = initial_df.with_columns([sssDf['Broadband & Cell Phone'].alias('Broadband & Cell Phone')])
+    initial_df = initial_df.with_columns([sssDf['Health Care Costs '].alias('Health Care Costs ')])
+    initial_df = initial_df.with_columns([sssDf['Transportation Costs'].alias('Transportation Costs')])
+    initial_df = initial_df.with_columns([sssDf['Child Care Costs'].alias('Child Care Costs')])
+    initial_df = initial_df.with_columns([sssDf['Taxes'].alias('Taxes')])
+    initial_df = initial_df.with_columns([sssDf['Earned Income Tax Credit (-)'].alias('Earned Income Tax Credit (-)')])
+    initial_df = initial_df.with_columns([sssDf['Child Care Tax Credit (-)'].alias('Child Care Tax Credit (-)')])
+    initial_df = initial_df.with_columns([sssDf['Child Tax Credit (-)'].alias('Child Tax Credit (-)')])
+
+    
+
     foodPlans = ['Thrifty', 'Low', 'Moderate', 'Liberal']
        
     #For every housing plan, copy the whole family types table
@@ -32,7 +43,7 @@ def monthlyBudgetMain(sssDf, housingDF):
             
     #print(monthlyBudgetDf) 
     
-    monthlyBudgetDf = getRestOfColumns(monthlyBudgetDf, sssDf)
+    #monthlyBudgetDf = getRestOfColumns(monthlyBudgetDf, sssDf)
         
     return monthlyBudgetDf
 
@@ -42,13 +53,13 @@ def getFoodCosts(listLength):
     
     current_row = 2
     while current_row < listLength+2:
-            food_formula = f'''=(HLOOKUP('Monthly Budget'!I{current_row},Food_means!$A$1:$E$6,2,FALSE)*'Monthly Budget'!$B{current_row}) + (HLOOKUP('Monthly Budget'!I{current_row},Food_means!$A$1:$E$6,3,FALSE)*'Monthly Budget'!$C{current_row}) + (HLOOKUP('Monthly Budget'!I{current_row},Food_means!$A$1:$E$6,4,FALSE)*'Monthly Budget'!$D{current_row}) + (HLOOKUP('Monthly Budget'!I{current_row},Food_means!$A$1:$E$6,5,FALSE)*'Monthly Budget'!$E{current_row}) + (HLOOKUP('Monthly Budget'!I{current_row},Food_means!$A$1:$E$6,6,FALSE)*'Monthly Budget'!$F{current_row})'''
+            food_formula = f'''=(HLOOKUP('Monthly Budget'!Q{current_row},Food_means!$A$1:$E$6,2,FALSE)*'Monthly Budget'!$B{current_row}) + (HLOOKUP('Monthly Budget'!Q{current_row},Food_means!$A$1:$E$6,3,FALSE)*'Monthly Budget'!$C{current_row}) + (HLOOKUP('Monthly Budget'!Q{current_row},Food_means!$A$1:$E$6,4,FALSE)*'Monthly Budget'!$D{current_row}) + (HLOOKUP('Monthly Budget'!Q{current_row},Food_means!$A$1:$E$6,5,FALSE)*'Monthly Budget'!$E{current_row}) + (HLOOKUP('Monthly Budget'!Q{current_row},Food_means!$A$1:$E$6,6,FALSE)*'Monthly Budget'!$F{current_row})'''
             foodCostsList.append(food_formula)
             current_row += 1
 
     return foodCostsList
 
 
-def getRestOfColumns(monthlyBudgetDf, sssDf):
+#def getRestOfColumns(monthlyBudgetDf, sssDf):
     
     
