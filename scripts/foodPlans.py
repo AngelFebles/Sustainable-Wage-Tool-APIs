@@ -208,18 +208,31 @@ def getAgeCohortMeans(df):
 
 
     meansDF = df.group_by('Age Cohort').agg(pl.col(['Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', 'Liberal Monthly']).mean())      
-    
+    meansDF = meansDF.rename({
+        'Thrifty Monthly': 'Thrifty',
+        'Low Monthly': 'Low',
+        'Moderate Monthly': 'Moderate',
+        'Liberal Monthly': 'Liberal'
+    })
     
     #Change the format of the columns to be compatible with the Self Sufficiency Standard
     
     #Pop Senior
     meansDF = meansDF.filter(pl.col('Age Cohort') != 'Senior')
     
-    #Make Adult the first row
+    #The new order must be Adult(s)	Infant(s) Preshooler(s)	Schoolager(s) Teenager(s)
     adult_row = meansDF.filter(pl.col('Age Cohort') == 'Adult').select(pl.col('*'))
-    meansDF = meansDF.filter(pl.col('Age Cohort') != 'Adult')
+    infant_row = meansDF.filter(pl.col('Age Cohort') == 'Infant').select(pl.col('*'))
+    preschooler_row = meansDF.filter(pl.col('Age Cohort') == 'Preschooler').select(pl.col('*'))
+    schoolager_row = meansDF.filter(pl.col('Age Cohort') == 'School Age').select(pl.col('*'))
+    teenager_row = meansDF.filter(pl.col('Age Cohort') == 'Teenager').select(pl.col('*'))
     
-    meansDF = pl.concat([adult_row, meansDF])
+    meansDF = pl.concat([adult_row, infant_row, preschooler_row, schoolager_row, teenager_row])
+    
+    #meansDF = meansDF.filter(pl.col('Age Cohort') != 'Adult')
+
+    
+    #meansDF = pl.concat([adult_row, meansDF])
 
       
    
