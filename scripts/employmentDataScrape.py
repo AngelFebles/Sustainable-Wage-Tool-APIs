@@ -1,6 +1,5 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import pandas as pd
 import polars as pl
 
 # Set up selenium
@@ -13,22 +12,36 @@ soup = BeautifulSoup(driver.page_source, 'html.parser')
 table = soup.find('table', {'class': 'regular'})
 
 # Extract the data
-df = pd.DataFrame()
+df = pl.DataFrame()
+
+# Extract data from the table and create a DataFrame
+header = []
+data = []
+max_length = 0
 
 for row in table.find_all('tr'):
-    columns = row.find_all(['td', 'th'])
-    columns = [elementsInRow.text.strip() for elementsInRow in columns]
-    df = df._append(pd.Series(columns), ignore_index=True) 
+    elements_in_row = row.find_all(['td', 'th'])
+    elements_in_row = [element.text.strip() for element in elements_in_row if element.text.strip()]
+    
+    if not header:
+        header = elements_in_row
+    else:
+        max_length = max(max_length, len(elements_in_row))
+        data.append(elements_in_row)
 
-#Makes first row the column names
-df.columns = df.iloc[0]
-df = df.iloc[1:]
+# Pad rows with empty values if necessary
+for i, row in enumerate(data):
+    data[i] += [''] * (max_length - len(row))
 
-#Deletes the last row (Its the sources of the info)
-df = df.iloc[:-1]
+df = pl.DataFrame(data, schema=header)
 
-#Deletes the last column (Its links to a pdf)
-df = df.iloc[:, :-1]
+
+
+# Deletes the last row (Its the sources of the info)
+df = df.head(-1)
+
+# Delete the last column (its links to a pdf)
+df = df.drop(df.columns[-1])
 
 
 print(df)
