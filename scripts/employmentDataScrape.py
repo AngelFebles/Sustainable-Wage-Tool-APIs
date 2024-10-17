@@ -1,10 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import time
-
-
+from selenium.webdriver import Chrome, ChromeOptions
+import os
 from bs4 import BeautifulSoup
 import polars as pl
 import time
@@ -60,79 +58,57 @@ def get_education_requirements():
 
     return df_education_requirements
 
-def get_occupation_salary():
-    driver = webdriver.Chrome()
-    driver.get("https://data.bls.gov/oes/#/home")
-
-    # Press "Multiple occupations for one geographical area"
-    try:
-        # Wait until the page has completely loaded
-        WebDriverWait(driver, 30).until(
-            lambda driver: driver.execute_script('return document.readyState') == 'complete'
-        )
-        print("Page fully loaded!")
-        
-        # Find first radial
-        radio_button = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "Multiple occupations for one geographical area"))
-        )
-
-        # Scroll into view and ensure the element is visible
-        driver.execute_script("arguments[0].scrollIntoView(true);", radio_button)
-        time.sleep(1)  # Give time for any scrolling or UI transitions
-
-        # Click the first radio button
-        driver.execute_script("arguments[0].click();", radio_button)
-        print("First radio button clicked")
-        
-        # Wait for the second button to be available
-        second_button = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "Metropolitan or Non Metropolitan Area"))
-        )
-        
-        # Scroll into view and ensure the element is visible
-        driver.execute_script("arguments[0].scrollIntoView(true);", second_button)
-        time.sleep(1)  # Give time for any scrolling or UI transitions
-
-        # Click the second button
-        driver.execute_script("arguments[0].click();", second_button)
-        print("Second button clicked")
-
-        # Wait for the <select> element with ID 'smsa' to appear
-        smsa_select = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "smsa"))
-        )
-        
-        print("Select element with ID 'smsa' found!")
-       
-
-        # Wait for a bit longer to ensure options are loaded
-        time.sleep(3)  # Wait for options to load; adjust as necessary
-
-        # Find the <optgroup> with the label "Wisconsin"
-        optgroup = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//optgroup[@label='Wisconsin']"))
-        )
-        #print(optgroup.get_attribute("innerHTML"))
-        # Retrieve all <option> elements within the <optgroup>
-        
-        # Retrieve the <option> element with the label "Racine, WI"
-        county_option = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "//optgroup[@label='Wisconsin']/option[@label='Racine, WI']"))
-        )
-        # Select the county option
-        driver.execute_script("arguments[0].click();", county_option)
-        print("Racine, WI selected")
-       
-        
-        
+def get_occupation_salary(absolute_path):
+    url = 'https://jobcenterofwisconsin.com/WisConomy/SaveSearch/RetriveSearchquery/1529'
     
+    prefs = {
+    "download.default_directory": absolute_path,
+    "download.directory_upgrade": True,
+    "download.prompt_for_download": False,
+    }
+
+    chromeOptions = ChromeOptions()
+    chromeOptions.add_experimental_option("prefs", prefs)
+    driver = Chrome(options=chromeOptions)
+    
+    driver.get(url)
+    time.sleep(1)
+
+    try:
+        # Find the button with the ID 'button_GenerateReport', then click it
+        generateReportButton = driver.find_element(By.ID, 'button_GenerateReport').click()
+        print("Report generated successfully!")
+        # Wait for the report to be generated
+        time.sleep(1)
+        
+        # Find the anchor with the href '#Download'
+        pressDownloadButton1 = driver.find_element(By.XPATH, "//a[@href='#Download']").click()
+        print("Changed page")
+        time.sleep(1)
+        #Press final download button
+        pressDownloadButton2 = driver.find_element(By.XPATH, "//button[@id='button_Download']").click()
+
+        
+        
+        time.sleep(1)
+
     except Exception as e:
         print(f"An error occurred: {e}")
+
     finally:
+        # Close the browser
         driver.quit()
+   
+        
+def fuse_tables(edutable, occupationtable):
+    
+    print("a")
+        
+    
 
+raw_files_dir = os.path.join(os.path.dirname(__file__), '../rawFiles')
+absolute_path = os.path.abspath(raw_files_dir)
 
+get_occupation_salary(absolute_path)
+ 
 
-# Call the function
-get_occupation_salary()
