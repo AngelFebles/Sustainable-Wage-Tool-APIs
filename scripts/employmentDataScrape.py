@@ -8,6 +8,18 @@ import polars as pl
 import time
 
 
+def get_employement_data():
+    educationDF = get_education_requirements()
+    
+    raw_files_dir = os.path.join(os.path.dirname(__file__), '../rawFiles')
+    absolute_path = os.path.abspath(raw_files_dir)
+    
+    salaryDF = get_occupation_salary(absolute_path)
+
+    # print(educationDF)
+    # print(salaryDF)
+    
+    finalTable =fuse_tables(educationDF, salaryDF)
 
 
 #BLS is very strick with bot activity and automatic data scraping.
@@ -45,7 +57,7 @@ def get_education_requirements():
     for i, row in enumerate(data):
         data[i] += [''] * (max_length - len(row))
 
-    df_education_requirements = pl.DataFrame(data, schema=header)
+    df_education_requirements = pl.DataFrame(data, schema=header, orient="row")
 
 
 
@@ -59,7 +71,9 @@ def get_education_requirements():
     return df_education_requirements
 
 def get_occupation_salary(absolute_path):
-    url = 'https://jobcenterofwisconsin.com/WisConomy/SaveSearch/RetriveSearchquery/1529'
+    url = 'https://jobcenterofwisconsin.com/WisConomy/SaveSearch/RetriveSearchquery/1530'
+    
+    
     
     prefs = {
     "download.default_directory": absolute_path,
@@ -98,17 +112,75 @@ def get_occupation_salary(absolute_path):
     finally:
         # Close the browser
         driver.quit()
+        
+    return file_to_df(absolute_path)
    
+#Always outputs a .csv file, so we look for that one
+def file_to_df(path):
+    """
+    Read all CSV files in the given directory into a DataFrame and delete the original files.
+
+    Args:
+        path (str): The path to the directory containing CSV files.
+
+    Returns:
+        list: List of DataFrames read from the CSV files.
+    """
+    if os.path.isdir(path):
+        # Get all files in the directory
+        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         
+        # Filter only the CSV files
+        csv_files = [f for f in files if f.endswith('.csv')]
+        
+        # Read all CSV files into a DataFrame
+        dfs = [pl.read_csv(os.path.join(path, file)) for file in csv_files]
+        #print(dfs)
+
+        # Delete the original files
+        for file in csv_files:
+            file_path = os.path.join(path, file)
+            os.remove(file_path)
+
+        return dfs
+    else:
+        print("File not found or not a CSV file")
+        return None
 def fuse_tables(edutable, occupationtable):
+    # Check if occupationtable is a list and convert it to a DataFrame if necessary
+    if isinstance(occupationtable, list):
+        occupationtable = pl.DataFrame(occupationtable[0])
     
-    print("a")
-        
+    if not isinstance(occupationtable, pl.DataFrame):
+        raise ValueError("occupationtable must be a Polars DataFrame or convertible to one")
     
-
-raw_files_dir = os.path.join(os.path.dirname(__file__), '../rawFiles')
-absolute_path = os.path.abspath(raw_files_dir)
-
-get_occupation_salary(absolute_path)
- 
-
+    # Convert the "Occupation Code" to string and clean up the data
+    aDF = occupationtable.with_columns(
+        pl.col("Occupation Code").cast(pl.Utf8).str.strip_chars()
+    ).select(["Occupation Code", "Employment", "Mean Wages"])
+    
+    # Drop the last two columns of edutable and clean the code column
+    edutable = edutable.drop(edutable.columns[-2:])
+    col_name = edutable.columns[1]  # The 2023 National Employment Matrix code
+    edutable = edutable.with_columns(
+        pl.col(col_name).str.replace("-", "").str.strip_chars().alias(col_name)
+    )
+    
+    # Debugging: Check unique values before joining
+    print("Unique Occupation Codes in aDF:")
+    print(aDF.select("Occupation Code").unique())
+    
+    print(f"Unique {col_name} in edutable:")
+    print(edutable.select(col_name).unique())
+    
+    # Perform an inner join on the matching codes
+    joined_df = edutable.join(
+        aDF,
+        left_on=col_name,
+        right_on="Occupation Code",
+        how="inner"
+    )
+    
+    print(joined_df)
+    return joined_df
+get_employement_data()
