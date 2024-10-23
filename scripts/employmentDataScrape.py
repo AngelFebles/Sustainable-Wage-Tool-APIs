@@ -9,6 +9,8 @@ import time
 
 
 def get_employement_data():
+    print('Getting employment data...')
+    
     educationDF = get_education_requirements()
     
     raw_files_dir = os.path.join(os.path.dirname(__file__), '../rawFiles')
@@ -19,7 +21,9 @@ def get_employement_data():
     # print(educationDF)
     # print(salaryDF)
     
-    finalTable =fuse_tables(educationDF, salaryDF)
+    finalTable = fuse_tables(educationDF, salaryDF)
+    
+    return finalTable
 
 
 #BLS is very strick with bot activity and automatic data scraping.
@@ -166,12 +170,12 @@ def fuse_tables(edutable, occupationtable):
         pl.col(col_name).str.replace("-", "").str.strip_chars().alias(col_name)
     )
     
-    # Debugging: Check unique values before joining
-    print("Unique Occupation Codes in aDF:")
-    print(aDF.select("Occupation Code").unique())
+    # # Debugging: Check unique values before joining
+    # print("Unique Occupation Codes in aDF:")
+    # print(aDF.select("Occupation Code").unique())
     
-    print(f"Unique {col_name} in edutable:")
-    print(edutable.select(col_name).unique())
+    # print(f"Unique {col_name} in edutable:")
+    # #print(edutable.select(col_name).unique())
     
     # Perform an inner join on the matching codes
     joined_df = edutable.join(
@@ -181,6 +185,10 @@ def fuse_tables(edutable, occupationtable):
         how="inner"
     )
     
-    print(joined_df)
-    return joined_df
-get_employement_data()
+    filtered_df = joined_df.filter(joined_df["Employment"] != "S")
+    
+    #print(joined_df)
+    return filtered_df
+
+
+#get_employement_data()
