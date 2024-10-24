@@ -8,6 +8,28 @@ import polars as pl
 import time
 
 
+#Change with your county name, it pulls data from the oe.area file.
+county = 'Racine, WI'
+
+
+def get_county_id(county):
+    
+    job_data_files_dir = os.path.join(os.path.dirname(__file__), '../JobDataFiles/oe.area')
+    absolute_pathJD = os.path.abspath(job_data_files_dir)
+    
+       
+    #oe.area
+    counties_df = pl.read_csv(absolute_pathJD, separator="\t")
+    
+    
+    # Look for the row containing the string county in the last column
+    county_row = counties_df.filter(pl.col(counties_df.columns[-1]) == county)
+    
+    # Extract the value from the 'area_code' column for the matched county row
+    county_area_code = county_row.select('area_code').to_series().item()
+
+    return county_area_code
+
 
 
 
@@ -43,7 +65,7 @@ def dowload_job_salary_data():
 
     try:
         print('Downloading job data...')
-        driver.find_element(By.XPATH, "//a[@href=\"/pub/time.series/oe/oe.data.1.AllData\"]").click()
+        #driver.find_element(By.XPATH, "//a[@href=\"/pub/time.series/oe/oe.data.1.AllData\"]").click()
         time.sleep(1)
         
     except Exception as e:
@@ -61,22 +83,78 @@ def dowload_job_salary_data():
         
         
         driver.quit()
-    print(file_path)
+    #print(file_path)
     df = file_to_df(file_path)
     
         
     #return file_to_df(absolute_path)
 
+def split_df(df):
+    county_id = get_county_id(county)
+    
+    df_only_from_county = df.filter(pl.col('series_id                     ').str.contains(county_id))
+    
+    return df_only_from_county
 
 
 def file_to_df(path):
     raw_df = pl.read_csv(path, separator="\t")
+    #drop the "comments" column
     raw_df = raw_df.drop(raw_df.columns[-1])
+ 
+    df_only_from_county = split_df(raw_df)
     
-    #print(raw_df)
+    
+       #take the column with all the data
+    df_only_from_county_only_data = pl.DataFrame({
+        "values": df_only_from_county.select(pl.col(df_only_from_county.columns[-1]))
+    })
+    
+        #jobIDs
+    df_only_from_county_onlyIDS = pl.DataFrame({
+        "values": df_only_from_county.select(pl.col(df_only_from_county.columns[0]))
+    })
+    
+    print(df_only_from_county_onlyIDS)
+    
+        
+    # Assuming your original DataFrame is named 'df'
+    original_column = df_only_from_county_only_data.to_series().to_numpy()
+
+    # Calculate the number of complete rows in the new DataFrame
+    num_complete_rows = len(original_column) // 17
+
+    # Reshape the array
+    reshaped_array = original_column[:num_complete_rows * 17].reshape(-1, 17)
+
+    # Create column names
+    column_names = [f"col_{i}" for i in range(1, 18)]
+
+    # Create the new DataFrame
+    new_df = pl.DataFrame(reshaped_array, schema=column_names)
+
+    print(new_df.shape)
+    print(new_df)
+    
+    return new_df    
+    #print(df_only_from_county_only_data)
+    
+    # new_columns = {f"col_{i}": df["values"].slice(i, 1) for i in range(17)}
+
+    # df_transformed = pl.DataFrame(new_columns)
+
+    # print(df_transformed)
+
+
+    
+    #print(df)
     
     #os.remove(path)
-    return raw_df
+    
+
+    
+    #return raw_df
 
     
 dowload_job_salary_data()
+
