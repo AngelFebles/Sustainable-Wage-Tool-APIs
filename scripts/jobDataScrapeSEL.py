@@ -92,7 +92,7 @@ def dowload_job_salary_data():
 def split_df(df):
     county_id = get_county_id(county)
     
-    df_only_from_county = df.filter(pl.col('series_id                     ').str.contains(county_id))
+    df_only_from_county = df.filter(pl.col('idCounty').str.contains(county_id))
     
     return df_only_from_county
 
@@ -101,19 +101,29 @@ def file_to_df(path):
     raw_df = pl.read_csv(path, separator="\t")
     #drop the "comments" column
     raw_df = raw_df.drop(raw_df.columns[-1])
- 
-    df_only_from_county = split_df(raw_df)
     
+    #Remove front and back characters (series identifiers) so we only have duplicates of the job id
+    
+    raw_df = raw_df.with_columns(pl.col("series_id                     ").str.slice(4,).alias("idCounty"))
+    raw_df = raw_df.with_columns(pl.col("idCounty").str.head(-19).alias("idCounty"))
+
+    #print(raw_df)
+   
+    df_only_from_county = split_df(raw_df)
     
     #take the column with all the data
     df_only_from_county_only_data = pl.DataFrame({
-        "values": df_only_from_county.select(pl.col(df_only_from_county.columns[-1]))
+        "values": df_only_from_county.select(pl.col(df_only_from_county.columns[-2]))
     })
+
     
     #jobIDs
     df_only_from_county_onlyIDS = pl.DataFrame({
         "ids": df_only_from_county.select(pl.col(df_only_from_county.columns[0]))
     })
+    
+    print('A')
+    print(df_only_from_county_only_data)
     
     #print(df_only_from_county_onlyIDS)
     
@@ -144,37 +154,40 @@ def file_to_df(path):
     reshaped_df = pl.DataFrame(reshaped_array, schema=column_names)
 
 
-    print(df_only_from_county_onlyIDS)
+    #print(df_only_from_county_onlyIDS)
     
     ######Creating jobIDs######
     
-    #Remove last 7 characters (series identifiers) so we only have duplicates of the job id
+    #Remove front and back characters (series identifiers) so we only have duplicates of the job id
     df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.with_columns(
     pl.col("ids").str.head(-7).alias("ids"))
-
-    df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.unique(subset="ids")
-
     
+   
+    # df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.with_columns(
+    # pl.col("ids").str.slice(17,).alias("ids"))
+    
+   
+   
+    #Delete duplicates of jobIDs
+    df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.unique(subset="ids")
+    print(df_only_from_county_onlyIDS)
+    
+    
+
     combined_df = pl.concat([df_only_from_county_onlyIDS, reshaped_df], how="horizontal")
 
 
     
     
-    print(combined_df)
+   # print(combined_df)
     
     
     
     #print(df_only_from_county_onlyIDS)
     
-    return combined_df    
-    #print(df_only_from_county_only_data)
+    #return combined_df    
     
-    # new_columns = {f"col_{i}": df["values"].slice(i, 1) for i in range(17)}
-
-    # df_transformed = pl.DataFrame(new_columns)
-
-    # print(df_transformed)
-
+    
 
     
     #print(df)
