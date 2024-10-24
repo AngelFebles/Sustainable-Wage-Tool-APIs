@@ -13,7 +13,7 @@ def get_employement_data():
     
     educationDF = get_education_requirements()
     
-    raw_files_dir = os.path.join(os.path.dirname(__file__), '../rawFiles')
+    raw_files_dir = os.path.join(os.path.dirname(__file__), '../DataFiles')
     absolute_path = os.path.abspath(raw_files_dir)
     
     salaryDF = get_occupation_salary(absolute_path)

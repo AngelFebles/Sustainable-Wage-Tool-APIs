@@ -23,11 +23,11 @@ def sssMain():
     filename = os.path.basename(linkToSSS)
 
     # Create the directory if it doesn't exist
-    os.makedirs('./rawFiles', exist_ok=True)
+    os.makedirs('./DataFiles', exist_ok=True)
     
     
     #Check if we already have that file
-    file_path = os.path.join('./rawFiles', filename)
+    file_path = os.path.join('./DataFiles', filename)
 
     if not os.path.exists(file_path):
         print('Downloading ', filename + '...')
