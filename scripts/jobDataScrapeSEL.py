@@ -105,20 +105,30 @@ def file_to_df(path):
     df_only_from_county = split_df(raw_df)
     
     
-       #take the column with all the data
+    #take the column with all the data
     df_only_from_county_only_data = pl.DataFrame({
         "values": df_only_from_county.select(pl.col(df_only_from_county.columns[-1]))
     })
     
-        #jobIDs
+    #jobIDs
     df_only_from_county_onlyIDS = pl.DataFrame({
-        "values": df_only_from_county.select(pl.col(df_only_from_county.columns[0]))
+        "ids": df_only_from_county.select(pl.col(df_only_from_county.columns[0]))
     })
     
-    print(df_only_from_county_onlyIDS)
+    #print(df_only_from_county_onlyIDS)
     
         
-    # Assuming your original DataFrame is named 'df'
+    
+    """
+    The list returns everything in a single column.
+    
+    We need to reshape and redistribute the elements into the 17 respective categories of each job
+    
+    We also need to have a single jobID per job, as oposed to 1 jobid per each job caterogry
+    """
+    
+    ######Reshaping data######
+    
     original_column = df_only_from_county_only_data.to_series().to_numpy()
 
     # Calculate the number of complete rows in the new DataFrame
@@ -131,12 +141,32 @@ def file_to_df(path):
     column_names = [f"col_{i}" for i in range(1, 18)]
 
     # Create the new DataFrame
-    new_df = pl.DataFrame(reshaped_array, schema=column_names)
+    reshaped_df = pl.DataFrame(reshaped_array, schema=column_names)
 
-    print(new_df.shape)
-    print(new_df)
+
+    print(df_only_from_county_onlyIDS)
     
-    return new_df    
+    ######Creating jobIDs######
+    
+    #Remove last 7 characters (series identifiers) so we only have duplicates of the job id
+    df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.with_columns(
+    pl.col("ids").str.head(-7).alias("ids"))
+
+    df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.unique(subset="ids")
+
+    
+    combined_df = pl.concat([df_only_from_county_onlyIDS, reshaped_df], how="horizontal")
+
+
+    
+    
+    print(combined_df)
+    
+    
+    
+    #print(df_only_from_county_onlyIDS)
+    
+    return combined_df    
     #print(df_only_from_county_only_data)
     
     # new_columns = {f"col_{i}": df["values"].slice(i, 1) for i in range(17)}
