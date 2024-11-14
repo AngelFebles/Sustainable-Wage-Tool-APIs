@@ -40,6 +40,11 @@ def monthlyBudgetMain(sssDf, housingDF):
     monthlyBudgetDf = monthlyBudgetDf.with_columns([
         pl.Series("Food Costs", getFoodCosts(len(monthlyBudgetDf)))
     ])
+    
+    monthlyBudgetDf = monthlyBudgetDf.with_columns([
+        pl.Series("Monthly Budget", calculateMonthlyBudget(len(monthlyBudgetDf)))
+    ])
+
             
     #print(monthlyBudgetDf) 
     
@@ -58,6 +63,19 @@ def getFoodCosts(listLength):
             current_row += 1
 
     return foodCostsList
+
+def calculateMonthlyBudget(listLength):
+      
+    #=SUM(G2:N2,P2,R2)
+    monthlyBudgetList = []
+    current_row = 2
+
+    while current_row < listLength+2:
+            monthlyBudgetFormula = f'''=SUM(G{current_row}:N{current_row},P{current_row},R{current_row})'''
+            monthlyBudgetList.append(monthlyBudgetFormula)
+            current_row += 1
+
+    return monthlyBudgetList
 
 
 #def getRestOfColumns(monthlyBudgetDf, sssDf):
