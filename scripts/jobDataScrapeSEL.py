@@ -91,8 +91,11 @@ def dowload_job_salary_data():
 
 def split_df(df):
     county_id = get_county_id(county)
-    
-    df_only_from_county = df.filter(pl.col('idCounty').str.contains(county_id))
+
+    county_header = 'OEUM00' + str(county_id)
+    print(county_header)
+
+    df_only_from_county = df.filter(pl.col('series_id                     ').str.contains(county_header))
     
     return df_only_from_county
 
@@ -122,8 +125,8 @@ def file_to_df(path):
         "ids": df_only_from_county.select(pl.col(df_only_from_county.columns[0]))
     })
     
-    print('A')
-    print(df_only_from_county_only_data)
+    # print('A')
+    # print(df_only_from_county_only_data)
     
     #print(df_only_from_county_onlyIDS)
     
@@ -157,27 +160,55 @@ def file_to_df(path):
     #print(df_only_from_county_onlyIDS)
     
     ######Creating jobIDs######
-    
+    #print(df_only_from_county_onlyIDS)
     #Remove front and back characters (series identifiers) so we only have duplicates of the job id
     df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.with_columns(
     pl.col("ids").str.head(-7).alias("ids"))
+
+    df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.with_columns(
+    pl.col("ids").str.tail(-17).alias("ids"))
+
+    #print(df_only_from_county_onlyIDS)
+    # print('B')
+    # print(df_only_from_county_onlyIDS)
     
-   
-    # df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.with_columns(
-    # pl.col("ids").str.slice(17,).alias("ids"))
-    
-   
-   
     #Delete duplicates of jobIDs
-    df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.unique(subset="ids")
-    print(df_only_from_county_onlyIDS)
+    df_only_from_county_onlyIDS = df_only_from_county_onlyIDS.unique(subset="ids",maintain_order=True)
+    
+   
+
+
+
+    #print(df_only_from_county_onlyIDS)
     
     
 
     combined_df = pl.concat([df_only_from_county_onlyIDS, reshaped_df], how="horizontal")
-
-
+    combined_df = combined_df.rename({
+        "col_1": "Employment",
+        "col_2": "Employment percent relative standard error",
+        "col_3": "Hourly mean wage",
+        "col_4": "Annual mean wage",
+        "col_5": "Wage percent relative standard error",
+        "col_6": "Hourly 10th percentile wage",
+        "col_7": "Hourly 25th percentile wage",
+        "col_8": "Hourly median wage",
+        "col_9": "Hourly 75th percentile wage",
+        "col_10": "Hourly 90th percentile wage",
+        "col_11": "Annual 10th percentile wage",
+        "col_12": "Annual 25th percentile wage",
+        "col_13": "Annual median wage",
+        "col_14": "Annual 75th percentile wage",
+        "col_15": "Annual 90th percentile wage",
+        "col_16": "Employment per 1,000 jobs",
+        "col_17": "Location Quotient"
+    })
     
+
+
+
+
+    print(combined_df)
     
    # print(combined_df)
     
@@ -198,6 +229,53 @@ def file_to_df(path):
     
     #return raw_df
 
+def get_education_requirements():
+    # Set up selenium
+    url = 'https://www.bls.gov/emp/tables/education-and-training-by-occupation.htm'
+    driver = webdriver.Chrome()
+    driver.get(url)
+
+    # Get the table
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    table = soup.find('table', {'class': 'regular'})
+
+    # Extract the data
+    df_education_requirements = pl.DataFrame()
+
+    # Extract data from the table and create a DataFrame
+    header = []
+    data = []
+    max_length = 0
+
+    for row in table.find_all('tr'):
+        elements_in_row = row.find_all(['td', 'th'])
+        elements_in_row = [element.text.strip() for element in elements_in_row if element.text.strip()]
+        
+        if not header:
+            header = elements_in_row
+        else:
+            max_length = max(max_length, len(elements_in_row))
+            data.append(elements_in_row)
+
+    # Pad rows with empty values if necessary
+    for i, row in enumerate(data):
+        data[i] += [''] * (max_length - len(row))
+
+    df_education_requirements = pl.DataFrame(data, schema=header, orient="row")
+
+
+
+    # Deletes the last row (Its the sources of the info)
+    df_education_requirements = df_education_requirements.head(-1)
+
+    # Delete the last column (its links to a pdf_education_requirements)
+    df_education_requirements = df_education_requirements.drop(df_education_requirements.columns[-1])
+
+
+    return df_education_requirements
+
+
     
 dowload_job_salary_data()
+print(get_education_requirements())
 
