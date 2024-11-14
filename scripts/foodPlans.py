@@ -10,6 +10,22 @@ import xlsxwriter
 
 
 def foodPlansmain():
+    '''
+    This function scrapes the USDA website for the most recent food plans and returns the weekly and monthly cost of each plan
+
+    These food plans are at a federal level, so it doesn't change for different counties.
+
+    The function returns @fused_df, a polars dataframewith the following columns:
+        Cohorts	
+        Age	
+        Age Cohort	
+        Thrifty Monthly	
+        Low Monthly	M
+        Moderate Monthly	
+        Liberal Monthly
+        
+    Representing the monthly costs for different food plans divided by age group and cohort
+    '''
     foodPlansHomePage = 'https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports'
     rSoup = requests.get(foodPlansHomePage)
 
@@ -79,6 +95,19 @@ def foodPlansmain():
 
 def getThriftyTable(linkToThriftyPlan):
     #Thirfty plan to raw text
+    
+    '''
+    This function takes a link to the most recent thrifty plan and returns a polars DataFrame with the following columns:
+
+        Age-sex group, Weekly cost, Monthly cost
+
+    Columns can be referenced as dictionary keys, so for example, to print the weekly cost of the thrifty plan you do:
+        print(thrifthy_plan['Weekly cost'])
+
+    And you can also get the nth value of a column by using its index:
+        print(thrifthy_plan['Weekly cost'][0]) 
+
+    '''
     rPDF = requests.get(linkToThriftyPlan)
     f = io.BytesIO(rPDF.content)
     
@@ -112,6 +141,19 @@ def getThriftyTable(linkToThriftyPlan):
 
 def getLowLiberalTable(linkToLowLiberalPlan):
       #Low to Liberal plan to raw text
+    '''
+    This function takes a link to the most recent low-liberal plan and returns a polars DataFrame with the following columns:
+
+        Age, Weekly cost low, Weekly cost moderate, Weekly cost liberal, 
+        Monthly cost low, Monthly cost moderate, Monthly cost liberal
+
+    Columns can be referenced as dictionary keys, so for example, to print the weekly low cost of the moderate plan you do:
+        print(low_to_liberaldf['Weekly cost low'])
+
+    And you can also get the nth value of a column by using its index:
+        print(low_to_liberaldf['Weekly cost low'][0]) 
+
+    '''
     rPDF = requests.get(linkToLowLiberalPlan)
     f = io.BytesIO(rPDF.content)
     
@@ -145,6 +187,25 @@ def getLowLiberalTable(linkToLowLiberalPlan):
 
     
 def splitCostList1(numberList):
+ 
+    """
+    Split a string of numbers with dollar signs into a list of floats.
+    
+    Parameters
+    ----------
+    numberList : str
+        A string of numbers with dollar signs, separated by newlines.
+    
+    Returns
+    -------
+    list
+        A list of floats.
+    
+    Examples
+    --------
+    >>> splitCostList1('$7.80\n$8.90')
+    [7.8, 8.9]
+    """
     values = numberList.replace('$', '').split('\n')
     float_values = [float(value) for value in values]
         
@@ -152,6 +213,24 @@ def splitCostList1(numberList):
 
 
 def splitGroupList1(groupList):
+    """
+    Splits a string of age group labels into a list of individual age ranges.
+
+    Parameters
+    ----------
+    groupList : str
+        A string containing age group labels separated by newlines, with an "Individual" label at the start.
+
+    Returns
+    -------
+    list
+        A list containing age ranges for child, male, and female groups, excluding headers.
+
+    Examples
+    --------
+    >>> splitGroupList1('Individuals\nChild Header\nChild 1\nChild 2\n...') 
+    ['Child 1', 'Child 2', ...']
+    """
     values = groupList.split('\n')
         
     #Remove the "Individual" label
@@ -170,6 +249,21 @@ def splitGroupList1(groupList):
 
 def fuse_food_plans(thrifthy_plan, low_to_lib_plan):
     
+    """
+    Fuse two DataFrames from the thrifty and low-to-liberal food plans into one.
+
+    Parameters
+    ----------
+    thrifthy_plan : polars.DataFrame
+        A DataFrame with columns 'Age', 'Weekly cost', and 'Monthly cost' for the thrifty plan.
+    low_to_lib_plan : polars.DataFrame
+        A DataFrame with columns 'Age', 'Weekly cost low', 'Weekly cost moderate', 'Weekly cost liberal', 'Monthly cost low', 'Monthly cost moderate', and 'Monthly cost liberal' for the low-to-liberal plan.
+
+    Returns
+    -------
+    polars.DataFrame
+        A DataFrame with columns 'Cohorts', 'Age', 'Age Cohort', 'Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', and 'Liberal Monthly'.
+    """
     ageGroups = ['Child'] * 5 + ["Male"] * 5 + ["Female"] * 5
     categories = ["Infant", "Preschooler", "Preschooler", "School Age", "School Age", "School Age", "Teenager", "Adult", "Senior", "Senior", "School Age", "Teenager", "Adult", "Senior", "Senior"]
 
@@ -193,6 +287,19 @@ def fuse_food_plans(thrifthy_plan, low_to_lib_plan):
     return fusedDF
 
 def getAgeCohortMeans(df):
+    """
+    Calculate the mean of each food plan for each age group.
+
+    Parameters
+    ----------
+    df : polars.DataFrame
+        A DataFrame with columns 'Age', 'Age Cohort', 'Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', and 'Liberal Monthly' for the fused food plans.
+
+    Returns
+    -------
+    polars.DataFrame
+        A DataFrame with columns 'Age Cohort', 'Thrifty', 'Low', 'Moderate', and 'Liberal' with the mean of each food plan for each age group.
+    """
     print('Calculating food plan means...')
     meansDF = pl.DataFrame({})
     

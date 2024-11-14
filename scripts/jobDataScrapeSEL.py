@@ -8,11 +8,34 @@ import polars as pl
 import time
 
 
-#Change with your county name, it pulls data from the oe.area file.
+"""
+This file gets the job data (salaries, educational requirements, ...) from the BLS API using Selenium and BeautifulSoup.
+
+"""
+
+
+
+#TODO:Change with your county name, it pulls data from the oe.area file.
 county = 'Racine, WI'
 
 
 def get_county_id(county):
+    
+    """
+    Given a county name, this function returns the corresponding 'area_code' value from the
+    'oe.area' file. This value is used to query the BLS API for data specific to the county.
+
+    Parameters
+    ----------
+    county : str
+        The name of the county for which the 'area_code' needs to be retrieved.
+
+    Returns
+    -------
+    str
+        The 'area_code' value for the given county.
+
+    """
     
     job_data_files_dir = os.path.join(os.path.dirname(__file__), '../JobDataFiles/oe.area')
     absolute_pathJD = os.path.abspath(job_data_files_dir)
@@ -90,6 +113,26 @@ def dowload_job_salary_data():
     #return file_to_df(absolute_path)
 
 def split_df(df):
+    """
+    Given a DataFrame with job data, this function filters it to only include data from the specific County.
+
+    Parameters
+    ----------
+    df : polars.DataFrame
+        The DataFrame to filter.
+        
+    Not a parameter, but a global variable:
+    
+    county_id : str
+        The 'area_code' value for the county of interest.
+
+    Returns
+    -------
+    polars.DataFrame
+        The filtered DataFrame containing only data from Racine County.
+
+    """
+    
     county_id = get_county_id(county)
 
     county_header = 'OEUM00' + str(county_id)
@@ -101,6 +144,28 @@ def split_df(df):
 
 
 def file_to_df(path):
+    """
+    Reads a file downloaded from the BLS website and processes it into a Polars DataFrame with 17 columns.
+    
+    Parameters
+    ----------
+    path : str
+        The path to the file to read.
+    
+    Returns
+    -------
+    polars.DataFrame
+        The processed DataFrame with 17 columns.
+    
+    Notes
+    -----
+    The function first reads the file into a DataFrame, then filters it to only include data from the specific County.
+    It then reshapes the data from a single column of 17 values per job to a DataFrame with 17 columns.
+    Finally, it creates a column of job IDs and assigns them to the DataFrame.
+    
+    All the commented out print statements are for debugging purposes.
+    
+    """
     raw_df = pl.read_csv(path, separator="\t")
     #drop the "comments" column
     raw_df = raw_df.drop(raw_df.columns[-1])
@@ -231,6 +296,21 @@ def file_to_df(path):
 
 def get_education_requirements():
     # Set up selenium
+    """
+    Scrapes the Bureau of Labor Statistics (BLS) website to extract education and training requirements
+    by occupation, and returns the data as a Polars DataFrame.
+
+    The function uses Selenium to navigate to the BLS webpage and retrieve the HTML content. BeautifulSoup 
+    is then used to parse the page and find the relevant table containing education requirements. The table 
+    data is extracted, cleaned, and converted into a Polars DataFrame, with the last row and column removed 
+    as they contain non-essential information.
+
+    Returns
+    -------
+    polars.DataFrame
+        A DataFrame containing education and training requirements by occupation, with each column 
+        representing a different attribute.
+    """
     url = 'https://www.bls.gov/emp/tables/education-and-training-by-occupation.htm'
     driver = webdriver.Chrome()
     driver.get(url)

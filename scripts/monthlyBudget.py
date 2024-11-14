@@ -1,7 +1,37 @@
 import polars as pl
 
+"""
+      This is the last sheet to be generated in the output excel file.
+      
+      It adds up the costs from all other sheets to determine the monthly budget for each family type.
+"""
 
 def monthlyBudgetMain(sssDf, housingDF):
+    """
+    This function takes the Self Sufficiency Standard DataFrame and the Housing Costs DataFrame to generate 
+    the monthly budget for different family types and housing plans. 
+    
+    It also takes into account the different food plans and their costs. (From foodPlans.py)
+    
+    The function returns a Polars DataFrame with the monthly budget for each family type and housing plan. 
+    
+    The monthly budget includes the costs of the housing plan, the food plan, and other costs such as broadband and cell phone, health care costs, 
+    transportation costs, and taxes. The function also subtracts the earned income tax credit, the child care tax credit, and the child tax credit from the monthly budget.
+
+    Parameters
+    ----------
+    sssDf : Polars DataFrame
+        The Self Sufficiency Standard DataFrame, which contains the monthly costs for each family type and housing plan.
+    housingDF : Polars DataFrame
+        The Housing Costs DataFrame, which contains the costs of each housing plan.
+
+    Returns
+    -------
+    Polars DataFrame
+        A Polars DataFrame with the monthly budget for each family type and housing plan.
+
+    """
+    
     monthlyBudgetDf = pl.DataFrame()
     print('Getting Monthly Budget data....')
     
@@ -54,7 +84,26 @@ def monthlyBudgetMain(sssDf, housingDF):
 
 def getFoodCosts(listLength):
 
+    """
+    This function takes a list length and returns a list of formulas for calculating the food costs column in the monthly budget dataframe.
+    
+    The formulas are based on the food means table and the housing selection, food selection, and family type columns in the monthly budget dataframe.
+    
+    Parameters
+    ----------
+    listLength : int
+        The length of the list to be returned.
+    
+    Returns
+    -------
+    list
+        A list of formulas for calculating the food costs column in the monthly budget dataframe.
+    """
     foodCostsList = []
+    
+    
+    #This is an excel formula to calculate the monthly costs
+    #Code just adds the formula for each row, changing the elements used for the formula as needed
     
     current_row = 2
     while current_row < listLength+2:
