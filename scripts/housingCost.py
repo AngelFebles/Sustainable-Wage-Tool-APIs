@@ -3,12 +3,10 @@ import scripts.credentials as credentials
 import polars as pl
 
 
-def housingCostMain():
+def housingCostMain(countyCode_HousingCost):
 
     """
     Scrapes the HUD website to retrieve the most recent housing cost data for Racine, WI by default.
-    
-    TODO: parameterize county code. var @countyCode at line 27
     
     The function sends a GET request to the HUD API to fetch data for different bedroom sizes.
     If successful, it processes the JSON response into a Polars DataFrame containing housing costs
@@ -24,7 +22,9 @@ def housingCostMain():
     df = ''
     
     #Variable to parameterize
-    countyCode = '5510199999'  # Racine, WI MSA
+    #countyCode = '5510199999'  # Racine, WI MSA
+    
+    countyCode = countyCode_HousingCost
 
     #Website with prices for All Bedroom Sizes for the specified county
     url = f'https://www.huduser.gov/hudapi/public/fmr/data/{countyCode}'

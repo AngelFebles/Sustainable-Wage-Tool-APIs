@@ -3,12 +3,12 @@ import requests
 from bs4 import BeautifulSoup
 import os
 
-def sssMain():
+import xlsxwriter
+
+def sssMain(county_SelfSufficiencyStandard):
     """
     Fetches the Self Sufficiency Standard data from the designated website for Wisconsin. 
     
-    TODO: parameterize county name. Var @county at line 79
-
     The function scrapes the website to find the most recent Self Sufficiency Standard file link,
     downloads it if not already present in the './DataFiles' directory, and reads the file to extract data 
     specific to Racine County. The data is processed using the `readFile` function, which reads the file 
@@ -55,10 +55,10 @@ def sssMain():
 
     #readFile(file_path)
      
-    return readFile(file_path)
+    return readFile(file_path, county_SelfSufficiencyStandard)
     
 
-def readFile(file_path):
+def readFile(file_path, county_SelfSufficiencyStandard):
     """
     Reads an Excel file using polars and extracts the Self Sufficiency Standard data.
 
@@ -74,7 +74,7 @@ def readFile(file_path):
 
     # Get the id of the row that contains the county, Racine by default
     
-    county = 'Racine County'
+    county = county_SelfSufficiencyStandard
     
     county_row = df.filter(pl.col(df.columns[10]).str.contains(county))
     county_index = county_row.select(pl.first()).row(0)[0]

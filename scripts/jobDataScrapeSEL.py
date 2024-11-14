@@ -6,17 +6,14 @@ import os
 from bs4 import BeautifulSoup
 import polars as pl
 import time
-
+import xlsxwriter
 
 """
 This file gets the job data (salaries, educational requirements, ...) from the BLS API using Selenium and BeautifulSoup.
 
 """
 
-
-
-#TODO:Change with your county name, it pulls data from the oe.area file.
-county = 'Racine, WI'
+#county = 'Racine, WI'
 
 
 def get_county_id(county):
@@ -57,7 +54,7 @@ def get_county_id(county):
 
 
 
-def dowload_job_salary_data():
+def dowload_job_salary_data(county):
     '''
     BLS is very strick with bot activity and automatic data scraping. 
     It prevents using tools like raw Beautiful Soup to download files.
@@ -107,12 +104,13 @@ def dowload_job_salary_data():
         
         driver.quit()
     #print(file_path)
-    df = file_to_df(file_path)
+    df = file_to_df(file_path, county)
     
+    return df
         
     #return file_to_df(absolute_path)
 
-def split_df(df):
+def split_df(df, county):
     """
     Given a DataFrame with job data, this function filters it to only include data from the specific County.
 
@@ -136,14 +134,14 @@ def split_df(df):
     county_id = get_county_id(county)
 
     county_header = 'OEUM00' + str(county_id)
-    print(county_header)
+    #print(county_header)
 
     df_only_from_county = df.filter(pl.col('series_id                     ').str.contains(county_header))
     
     return df_only_from_county
 
 
-def file_to_df(path):
+def file_to_df(path, county):
     """
     Reads a file downloaded from the BLS website and processes it into a Polars DataFrame with 17 columns.
     
@@ -177,7 +175,7 @@ def file_to_df(path):
 
     #print(raw_df)
    
-    df_only_from_county = split_df(raw_df)
+    df_only_from_county = split_df(raw_df, county)
     
     #take the column with all the data
     df_only_from_county_only_data = pl.DataFrame({
@@ -269,30 +267,8 @@ def file_to_df(path):
         "col_17": "Location Quotient"
     })
     
-
-
-
-
-    print(combined_df)
+    return combined_df
     
-   # print(combined_df)
-    
-    
-    
-    #print(df_only_from_county_onlyIDS)
-    
-    #return combined_df    
-    
-    
-
-    
-    #print(df)
-    
-    #os.remove(path)
-    
-
-    
-    #return raw_df
 
 def get_education_requirements():
     # Set up selenium
@@ -350,12 +326,23 @@ def get_education_requirements():
 
     # Delete the last column (its links to a pdf_education_requirements)
     df_education_requirements = df_education_requirements.drop(df_education_requirements.columns[-1])
-
+    
+    #Remove the '-' from the SOC code
+    df_education_requirements = df_education_requirements.with_columns(
+        pl.col(df_education_requirements.columns[1]).str.replace("-", "").alias(df_education_requirements.columns[1])
+    )
 
     return df_education_requirements
 
 
-    
-dowload_job_salary_data()
-print(get_education_requirements())
+def jobDataScrapeStarter(county):
+    job_data_df = pl.DataFrame(dowload_job_salary_data(county))
+    educational_requirements_df = pl.DataFrame(get_education_requirements()) 
 
+    with xlsxwriter.Workbook("jobData.xlsx") as workbook:
+        job_data_df.write_excel(workbook=workbook,worksheet='Job_Data')
+        educational_requirements_df.write_excel(workbook=workbook,worksheet='Education_Requirements')
+    
+    
+
+#jobDataScrapeStarter()
