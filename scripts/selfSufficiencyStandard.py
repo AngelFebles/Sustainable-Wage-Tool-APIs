@@ -3,8 +3,22 @@ import requests
 from bs4 import BeautifulSoup
 import os
 
-def sssMain():
+import xlsxwriter
+
+def sssMain(county_SelfSufficiencyStandard):
+    """
+    Fetches the Self Sufficiency Standard data from the designated website for Wisconsin. 
+    
+    The function scrapes the website to find the most recent Self Sufficiency Standard file link,
+    downloads it if not already present in the './DataFiles' directory, and reads the file to extract data 
+    specific to Racine County. The data is processed using the `readFile` function, which reads the file 
+    into a Polars DataFrame.
+
+    Returns:
+       @dataFrame: A polars DataFrame with data specific to the County extracted from the Self Sufficiency Standard file.
+    """
     print('Getting Self Sufficiency Standard data....')
+    
     sssHomePage = 'https://selfsufficiencystandard.org/Wisconsin/'
     rSoup = requests.get(sssHomePage)
 
@@ -23,15 +37,15 @@ def sssMain():
     filename = os.path.basename(linkToSSS)
 
     # Create the directory if it doesn't exist
-    os.makedirs('./rawFiles', exist_ok=True)
+    os.makedirs('./DataFiles', exist_ok=True)
     
     
     #Check if we already have that file
-    file_path = os.path.join('./rawFiles', filename)
+    file_path = os.path.join('./DataFiles', filename)
 
+    #If not, download it
     if not os.path.exists(file_path):
         print('Downloading ', filename + '...')
-        # Download the file
         response = requests.get(linkToSSS)
         with open(file_path, 'wb') as file:
             file.write(response.content)
@@ -41,18 +55,28 @@ def sssMain():
 
     #readFile(file_path)
      
-    return readFile(file_path)
+    return readFile(file_path, county_SelfSufficiencyStandard)
     
 
-def readFile(file_path):
+def readFile(file_path, county_SelfSufficiencyStandard):
+    """
+    Reads an Excel file using polars and extracts the Self Sufficiency Standard data.
+
+    Parameters:
+        file_path (str): The path to the Excel file.
+
+    """
     print('Reading the file...')
     # Read the Excel file using polars
     #df = pl.read_excel(file_path, sheet_name='By County')
     df = pl.read_excel(file_path, sheet_name='By Family').with_row_index(name='index')
 
 
-    # Get the id of the row that contains Racine County
-    county_row = df.filter(pl.col(df.columns[10]).str.contains('Racine County'))
+    # Get the id of the row that contains the county, Racine by default
+    
+    county = county_SelfSufficiencyStandard
+    
+    county_row = df.filter(pl.col(df.columns[10]).str.contains(county))
     county_index = county_row.select(pl.first()).row(0)[0]
     
     #Theres 719 rows for each county, thats where the upperbound comes from

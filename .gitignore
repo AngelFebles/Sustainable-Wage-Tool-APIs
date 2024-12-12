@@ -2,8 +2,10 @@ credentials.py
 
 tempCodeRunnerFile.py
 
-/rawFiles/*
+/DataFiles/*
 
 *dataOutput.xlsx*
+
+*jobData.xlsx*
 
 __pycache__
