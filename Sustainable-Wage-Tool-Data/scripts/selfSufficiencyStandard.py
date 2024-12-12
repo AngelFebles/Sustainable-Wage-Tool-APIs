@@ -37,11 +37,11 @@ def sssMain(county_SelfSufficiencyStandard):
     filename = os.path.basename(linkToSSS)
 
     # Create the directory if it doesn't exist
-    os.makedirs('./DataFiles', exist_ok=True)
+    os.makedirs(r'Sustainable-Wage-Tool-Data\DataFiles', exist_ok=True)
     
     
     #Check if we already have that file
-    file_path = os.path.join('./DataFiles', filename)
+    file_path = os.path.join(r'Sustainable-Wage-Tool-Data\DataFiles', filename)
 
     #If not, download it
     if not os.path.exists(file_path):

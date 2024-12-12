@@ -74,7 +74,7 @@ def generate_county_data(county_name):
     
     """
    
-    counties_fips_path = 'DataFiles/countiesFIPSCodes.data'
+    counties_fips_path = 'Sustainable-Wage-Tool-Data/DataFiles/countiesFIPSCodes.data'
     
     # Read the file into a DataFrame
     counties_fips_df = pl.read_csv(counties_fips_path, separator="\t")
