@@ -21,7 +21,7 @@ It also outputs an excel file with job data (salaries, educational requirements,
 dataOutput.xlsx contains the following sheets:
 
 Housing_lookup  --- Costs for each housing plan
-Self_Sufficiency_Standard
+Self_Sufficiency_Standard --- Self Sufficiency Standard data
 Food_lookup --- Costs for each food plan, divided by age and gender
 Food_means --- Average costs for each food plan, divided by age group (Adult, Infant, Preschooler, School Age, Teenager)
 Monthly Budget --- Addition of all the previous costs to determine the monthly budget according to family size
