@@ -33,26 +33,131 @@ Education_Requirements --- Educational requirements for each job
 """
 
 
-#TODO: Change these for your desired county
+# Legacy code, if you want to hardcode county data for debugging:
 
-# For the SSS, this is the FIPS code of the county followed by five 9s.
-# You can get the FIPS code from here:
-# https://dpi.wi.gov/sfs/statistical/basic-facts/wisconsin-counties
-# So for example, Sauk County has has a FIPS code of 55111, so you would put 5511199999
-# Racine has a FIPS code of 55101, so you would put 5510199999, etc
-countyCode_HousingCost = '5510199999'  
+# # For the SSS, this is the FIPS code of the county followed by five 9s.
+# # You can get the FIPS code from here:
+# # https://dpi.wi.gov/sfs/statistical/basic-facts/wisconsin-counties
+# # So for example, Sauk County has has a FIPS code of 55111, so you would put 5511199999
+# # Racine has a FIPS code of 55101, so you would put 5510199999, etc
+# countyCode_HousingCost = '5510199999'  
 
-# Make sure to put county name with the first letter beging a capital letter 
-# Followed by the word "County" (wich also needs to have leading capital letter )
-# For example: "Racine County", "Dodge County", "Eau Claire County"
-county_SelfSufficiencyStandard = 'Racine County'
+# # Make sure to put county name with the first letter beging a capital letter 
+# # Followed by the word "County" (wich also needs to have leading capital letter )
+# # For example: "Racine County", "Dodge County", "Eau Claire County"
+# county_SelfSufficiencyStandard = 'Racine County'
 
 
-#Make sure to put county name with the first letter beging a capital letter
-#Then, followed by the string ", WI" (For Wisconsin) (there is no space between county name and the comma)
-#For example: "Racine, WI", "Dodge, WI", "Eau Claire, WI"
-county_JobData = 'Racine, WI'
+# #Make sure to put county name with the first letter beging a capital letter
+# #Then, followed by the string ", WI" (For Wisconsin) (there is no space between county name and the comma)
+# #For example: "Racine, WI", "Dodge, WI", "Eau Claire, WI"
+# county_JobData = 'Racine, WI'
 
+def generate_county_data(county_name):
+
+    #This capitalizes the first letter of each word in the county name and 
+    #makes the other letters lowercase
+    #The "du" expection is for the county "Fond du Lac", which needs du to be lowercase
+    county_name = county_name.title().replace("Du", "du")
+
+    """
+    Fip codes are unique identifiers for states, counties, etc
+
+    Since codes are static, is faster to store the ones from all counties of Wisconsin in a dictionary
+    rather than looking them up from an api every time.
+
+    TODO: If this code is to be used for other states, this dictionary will need to be updated.
+    
+    Got these from here: https://dpi.wi.gov/sfs/statistical/basic-facts/wisconsin-counties
+    
+    """
+   
+    fips_lookup = {
+        'Adams': '55001',
+        'Ashland': '55003',
+        'Barron': '55005',
+        'Bayfield': '55007',
+        'Brown': '55009',
+        'Buffalo': '55011',
+        'Burnett': '55013',
+        'Calumet': '55015',
+        'Chippewa': '55017',
+        'Clark': '55019',
+        'Columbia': '55021',
+        'Crawford': '55023',
+        'Dane': '55025',
+        'Dodge': '55027',
+        'Door': '55029',
+        'Douglas': '55031',
+        'Dunn': '55033',
+        'Eau Claire': '55035',
+        'Florence': '55037',
+        'Fond du Lac': '55039',
+        'Forest': '55041',
+        'Grant': '55043',
+        'Green': '55045',
+        'Green Lake': '55047',
+        'Iowa': '55049',
+        'Iron': '55051',
+        'Jackson': '55053',
+        'Jefferson': '55055',
+        'Juneau': '55057',
+        'Kenosha': '55059',
+        'Kewaunee': '55061',
+        'La Crosse': '55063',
+        'Lafayette': '55065',
+        'Langlade': '55067',
+        'Lincoln': '55069',
+        'Manitowoc': '55071',
+        'Marathon': '55073',
+        'Marinette': '55075',
+        'Marquette': '55077',
+        'Menominee': '55078',
+        'Milwaukee': '55079',
+        'Monroe': '55081',
+        'Oconto': '55083',
+        'Oneida': '55085',
+        'Outagamie': '55087',
+        'Ozaukee': '55089',
+        'Pepin': '55091',
+        'Pierce': '55093',
+        'Polk': '55095',
+        'Portage': '55097',
+        'Price': '55099',
+        'Racine': '55101',
+        'Richland': '55103',
+        'Rock': '55105',
+        'Rusk': '55107',
+        'Saint Croix': '55109',
+        'Sauk': '55111',
+        'Sawyer': '55113',
+        'Shawano': '55115',
+        'Sheboygan': '55117',
+        'Taylor': '55119',
+        'Trempealeau': '55121',
+        'Vernon': '55123',
+        'Vilas': '55125',
+        'Walworth': '55127',
+        'Washburn': '55129',
+        'Washington': '55131',
+        'Waukesha': '55133',
+        'Waupaca': '55135',
+        'Waushara': '55137',
+        'Winnebago': '55139',
+        'Wood': '55141'
+}
+
+    fips_code = fips_lookup.get(county_name.capitalize())
+    if not fips_code:
+        raise ValueError("County not found")
+    
+    county_code_housing_cost = f'{fips_code}99999'
+    county_self_sufficiency_standard = f'{county_name.capitalize()} County'
+    county_job_data = f'{county_name.capitalize()}, WI'
+    
+    return county_code_housing_cost, county_self_sufficiency_standard, county_job_data
+
+countyCode_HousingCost, county_SelfSufficiencyStandard, county_JobData = generate_county_data('racine')
 
 
 
@@ -79,3 +184,4 @@ with xlsxwriter.Workbook("dataOutput.xlsx") as workbook:
     
 
 jobDataScrapeStarter(county_JobData)
+print("Done!")
