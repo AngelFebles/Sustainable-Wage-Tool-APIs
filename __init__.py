@@ -1,6 +1,8 @@
 import polars as pl
 import xlsxwriter
 
+import argparse
+
 from scripts.foodPlans import foodPlansmain
 from scripts.foodPlans import getAgeCohortMeans
 from scripts.housingCost import housingCostMain
@@ -63,7 +65,7 @@ def generate_county_data(county_name):
     """
     Fip codes are unique identifiers for states, counties, etc
 
-    Since codes are static, is faster to store the ones from all counties of Wisconsin in a dictionary
+    Since codes are static, is faster to store the ones from all counties of Wisconsin in a file
     rather than looking them up from an api every time.
 
     TODO: If this code is to be used for other states, this dictionary will need to be updated.
@@ -72,92 +74,33 @@ def generate_county_data(county_name):
     
     """
    
-    fips_lookup = {
-        'Adams': '55001',
-        'Ashland': '55003',
-        'Barron': '55005',
-        'Bayfield': '55007',
-        'Brown': '55009',
-        'Buffalo': '55011',
-        'Burnett': '55013',
-        'Calumet': '55015',
-        'Chippewa': '55017',
-        'Clark': '55019',
-        'Columbia': '55021',
-        'Crawford': '55023',
-        'Dane': '55025',
-        'Dodge': '55027',
-        'Door': '55029',
-        'Douglas': '55031',
-        'Dunn': '55033',
-        'Eau Claire': '55035',
-        'Florence': '55037',
-        'Fond du Lac': '55039',
-        'Forest': '55041',
-        'Grant': '55043',
-        'Green': '55045',
-        'Green Lake': '55047',
-        'Iowa': '55049',
-        'Iron': '55051',
-        'Jackson': '55053',
-        'Jefferson': '55055',
-        'Juneau': '55057',
-        'Kenosha': '55059',
-        'Kewaunee': '55061',
-        'La Crosse': '55063',
-        'Lafayette': '55065',
-        'Langlade': '55067',
-        'Lincoln': '55069',
-        'Manitowoc': '55071',
-        'Marathon': '55073',
-        'Marinette': '55075',
-        'Marquette': '55077',
-        'Menominee': '55078',
-        'Milwaukee': '55079',
-        'Monroe': '55081',
-        'Oconto': '55083',
-        'Oneida': '55085',
-        'Outagamie': '55087',
-        'Ozaukee': '55089',
-        'Pepin': '55091',
-        'Pierce': '55093',
-        'Polk': '55095',
-        'Portage': '55097',
-        'Price': '55099',
-        'Racine': '55101',
-        'Richland': '55103',
-        'Rock': '55105',
-        'Rusk': '55107',
-        'Saint Croix': '55109',
-        'Sauk': '55111',
-        'Sawyer': '55113',
-        'Shawano': '55115',
-        'Sheboygan': '55117',
-        'Taylor': '55119',
-        'Trempealeau': '55121',
-        'Vernon': '55123',
-        'Vilas': '55125',
-        'Walworth': '55127',
-        'Washburn': '55129',
-        'Washington': '55131',
-        'Waukesha': '55133',
-        'Waupaca': '55135',
-        'Waushara': '55137',
-        'Winnebago': '55139',
-        'Wood': '55141'
-}
-
-    fips_code = fips_lookup.get(county_name.capitalize())
+    counties_fips_path = 'DataFiles/countiesFIPSCodes.data'
+    
+    # Read the file into a DataFrame
+    counties_fips_df = pl.read_csv(counties_fips_path, separator="\t")
+        
+    # Find the FIPS code for the given county name
+    county_row = counties_fips_df.filter(pl.col("County Name") == county_name.capitalize())
+    fips_code = county_row.select("FIPS Code").to_series().item()
+    
     if not fips_code:
         raise ValueError("County not found")
     
+    #We need to append 5 9s to the end of the FIPS code to lookup in the database
     county_code_housing_cost = f'{fips_code}99999'
+      
     county_self_sufficiency_standard = f'{county_name.capitalize()} County'
     county_job_data = f'{county_name.capitalize()}, WI'
     
     return county_code_housing_cost, county_self_sufficiency_standard, county_job_data
 
-countyCode_HousingCost, county_SelfSufficiencyStandard, county_JobData = generate_county_data('racine')
+
+
+parser = argparse.ArgumentParser(description="Process county name for data extraction.")
+parser.add_argument('county_name', type=str, help='Name of the county to process')
+args = parser.parse_args()
+
+countyCode_HousingCost, county_SelfSufficiencyStandard, county_JobData = generate_county_data(args.county_name)
 
 
 

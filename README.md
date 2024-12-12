@@ -8,6 +8,10 @@ Food Plan List: https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-
 
 Self Sufficiency Standard: https://selfsufficiencystandard.org/Wisconsin/
 
+Job Salary Data: https://download.bls.gov/pub/time.series/oe/
+
+Job Educational Requirements: https://www.bls.gov/emp/tables/education-and-training-by-occupation.htm
+
 Before running the scripts, make sure to install the required packages. Run this command in the project's root folder:
 
 ```
