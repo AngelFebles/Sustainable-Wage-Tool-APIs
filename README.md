@@ -21,13 +21,13 @@ pip install -r requirements.txt
 This project uses argparse for county lookup. To initialize project run from the command line:
 
 ```
-python .\Sustainable-Wage-Tool-Data\__init__.py "county name"
+python .\sustainable-wage-tool-data\__init__.py "county name"
 ```
 
 Example: 
 
 ```
-python .\Sustainable-Wage-Tool-Data\__init__.py "racine"
+python .\sustainable-wage-tool-data\__init__.py "racine"
 ```
 
 Upon execution, project will output two files:

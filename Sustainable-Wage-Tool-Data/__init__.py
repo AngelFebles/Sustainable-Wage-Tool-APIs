@@ -96,35 +96,37 @@ def generate_county_data(county_name):
 
 
 
-parser = argparse.ArgumentParser(description="Process county name for data extraction.")
-parser.add_argument('county_name', type=str, help='Name of the county to process')
-args = parser.parse_args()
+if __name__ == "__main__":
 
-countyCode_HousingCost, county_SelfSufficiencyStandard, county_JobData = generate_county_data(args.county_name)
+    parser = argparse.ArgumentParser(description="Process county name for data extraction.")
+    parser.add_argument('county_name', type=str, help='Name of the county to process')
+    args = parser.parse_args()
 
-
-
-#Creating dataframes for each sheet
-
-housing_cost_plan_df = pl.DataFrame(housingCostMain(countyCode_HousingCost))
-food_plans_df = pl.DataFrame(foodPlansmain())
-food_plans_means_df = pl.DataFrame(getAgeCohortMeans(food_plans_df))
-self_sufficiency_standard_df = pl.DataFrame(sssMain(county_SelfSufficiencyStandard))
-monthly_budget_df = pl.DataFrame(monthlyBudgetMain(self_sufficiency_standard_df,housing_cost_plan_df))
-
-#thrifthydf.write_excel(workbook="polars_simple.xlsx", worksheet='foodPlansA')
+    countyCode_HousingCost, county_SelfSufficiencyStandard, county_JobData = generate_county_data(args.county_name)
 
 
-#Filling the dataframes with the info from each script
 
-with xlsxwriter.Workbook("dataOutput.xlsx") as workbook:
-    housing_cost_plan_df.write_excel(workbook=workbook,worksheet='Housing_lookup')
-    self_sufficiency_standard_df.write_excel(workbook=workbook,worksheet='Self_Sufficiency_Standard')
-    food_plans_df.write_excel(workbook=workbook,worksheet='Food_lookup')
-    food_plans_means_df.write_excel(workbook=workbook,worksheet='Food_means')    
-    #jobs_data_df.write_excel(workbook=workbook,worksheet='Jobs')
-    monthly_budget_df.write_excel(workbook=workbook,worksheet='Monthly Budget')
-    
+    #Creating dataframes for each sheet
 
-jobDataScrapeStarter(county_JobData)
-print("Done!")
+    housing_cost_plan_df = pl.DataFrame(housingCostMain(countyCode_HousingCost))
+    food_plans_df = pl.DataFrame(foodPlansmain())
+    food_plans_means_df = pl.DataFrame(getAgeCohortMeans(food_plans_df))
+    self_sufficiency_standard_df = pl.DataFrame(sssMain(county_SelfSufficiencyStandard))
+    monthly_budget_df = pl.DataFrame(monthlyBudgetMain(self_sufficiency_standard_df,housing_cost_plan_df))
+
+    #thrifthydf.write_excel(workbook="polars_simple.xlsx", worksheet='foodPlansA')
+
+
+    #Filling the dataframes with the info from each script
+
+    with xlsxwriter.Workbook("dataOutput.xlsx") as workbook:
+        housing_cost_plan_df.write_excel(workbook=workbook,worksheet='Housing_lookup')
+        self_sufficiency_standard_df.write_excel(workbook=workbook,worksheet='Self_Sufficiency_Standard')
+        food_plans_df.write_excel(workbook=workbook,worksheet='Food_lookup')
+        food_plans_means_df.write_excel(workbook=workbook,worksheet='Food_means')    
+        #jobs_data_df.write_excel(workbook=workbook,worksheet='Jobs')
+        monthly_budget_df.write_excel(workbook=workbook,worksheet='Monthly Budget')
+        
+
+    jobDataScrapeStarter(county_JobData)
+    print("Done!")
