@@ -85,7 +85,7 @@ def dowload_job_salary_data(county):
 
     try:
         print('Downloading job data...')
-        #driver.find_element(By.XPATH, "//a[@href=\"/pub/time.series/oe/oe.data.1.AllData\"]").click()
+        driver.find_element(By.XPATH, "//a[@href=\"/pub/time.series/oe/oe.data.1.AllData\"]").click()
         time.sleep(1)
         
     except Exception as e:
