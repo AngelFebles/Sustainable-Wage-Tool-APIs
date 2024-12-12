@@ -1,9 +1,9 @@
 from setuptools import setup
 
 setup(
-    name='Sustainable-Wage-Tool-APIs',
+    name='Sustainable-Wage-Tool-Data',
     version='1.0.0',
-    packages=['Sustainable-Wage-Tool-APIs'],
+    packages=['Sustainable-Wage-Tool-Data'],
     install_requires=[  
         'beautifulsoup4==4.12.3',
         'pdfplumber==0.11.4',
@@ -11,7 +11,7 @@ setup(
         'Requests==2.32.3',
         'selenium==4.25.0',
         'XlsxWriter==3.2.0',
-        'fastexcel'
+        'fastexcel',
         'argparse'
     ],
     author='Angel Febles'
