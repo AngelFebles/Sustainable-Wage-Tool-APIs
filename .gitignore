@@ -3,6 +3,7 @@ credentials.py
 tempCodeRunnerFile.py
 
 /DataFiles/*
+!/DataFiles/countiesFIPSCodes.data
 
 *dataOutput.xlsx*
 
