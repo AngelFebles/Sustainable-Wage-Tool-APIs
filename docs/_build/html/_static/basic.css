@@ -678,9 +678,6 @@ dl > dd:last-child > :last-child {
     margin-bottom: 0;
 }
 
-dt:target, span.highlighted {
-    background-color: #fbe54e;
-}
 
 rect.highlighted {
     fill: #fbe54e;
