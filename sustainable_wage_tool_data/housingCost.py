@@ -1,9 +1,9 @@
 import requests
-import scripts.credentials as credentials
+#import credentials 
 import polars as pl
 
 
-def housingCostMain(countyCode_HousingCost):
+def housingCostMain(countyCode_HousingCost, apiKey_HousingCost):
 
     """
     Scrapes the HUD website to retrieve the most recent housing cost data for Racine, WI by default.
@@ -29,8 +29,12 @@ def housingCostMain(countyCode_HousingCost):
     #Website with prices for All Bedroom Sizes for the specified county
     url = f'https://www.huduser.gov/hudapi/public/fmr/data/{countyCode}'
 
+    APIKEYHOUSING = apiKey_HousingCost
+    
+
     headers = {
-        'Authorization': f'Bearer {credentials.APIKEYHOUSING}'
+        #'Authorization': f'Bearer {credentials.APIKEYHOUSING}'
+        'Authorization': f'Bearer {APIKEYHOUSING}'
     }
 
     response = requests.get(url, headers=headers)

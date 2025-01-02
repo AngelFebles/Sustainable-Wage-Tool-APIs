@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./sustainable_wage_tool_data"
+    ]
+}

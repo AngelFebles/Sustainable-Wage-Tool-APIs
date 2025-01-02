@@ -3,12 +3,15 @@ import xlsxwriter
 
 import argparse
 
-from scripts.foodPlans import foodPlansmain
-from scripts.foodPlans import getAgeCohortMeans
-from scripts.housingCost import housingCostMain
-from scripts.selfSufficiencyStandard import sssMain
-from scripts.monthlyBudget import monthlyBudgetMain
-from scripts.jobDataScrapeSEL import jobDataScrapeStarter
+from foodPlans import foodPlansmain
+from foodPlans import getAgeCohortMeans
+from housingCost import housingCostMain
+from selfSufficiencyStandard import sssMain
+from monthlyBudget import monthlyBudgetMain
+from jobDataScrapeSEL import jobDataScrapeStarter
+
+
+from credentials import APIKEYHOUSING
 #from scripts.employmentDataScrape import get_employement_data
 
 
@@ -60,6 +63,9 @@ def generate_county_data(county_name):
     #This capitalizes the first letter of each word in the county name and 
     #makes the other letters lowercase
     #The "du" expection is for the county "Fond du Lac", which needs du to be lowercase
+    
+    #TODO: Refactor into a list of articles
+    #word boundries 
     county_name = county_name.title().replace("Du", "du")
 
     """
@@ -69,12 +75,14 @@ def generate_county_data(county_name):
     rather than looking them up from an api every time.
 
     TODO: If this code is to be used for other states, this dictionary will need to be updated.
+     
+    
     
     Got these from here: https://dpi.wi.gov/sfs/statistical/basic-facts/wisconsin-counties
     
     """
    
-    counties_fips_path = 'Sustainable-Wage-Tool-Data/DataFiles/countiesFIPSCodes.data'
+    counties_fips_path = 'sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data'
     
     # Read the file into a DataFrame
     counties_fips_df = pl.read_csv(counties_fips_path, separator="\t")
@@ -95,6 +103,8 @@ def generate_county_data(county_name):
     return county_code_housing_cost, county_self_sufficiency_standard, county_job_data
 
 
+#TODO: Improve comparison of strings for county names. Use "Regular Expressions"
+
 
 if __name__ == "__main__":
 
@@ -108,7 +118,7 @@ if __name__ == "__main__":
 
     #Creating dataframes for each sheet
 
-    housing_cost_plan_df = pl.DataFrame(housingCostMain(countyCode_HousingCost))
+    housing_cost_plan_df = pl.DataFrame(housingCostMain(countyCode_HousingCost, APIKEYHOUSING))
     food_plans_df = pl.DataFrame(foodPlansmain())
     food_plans_means_df = pl.DataFrame(getAgeCohortMeans(food_plans_df))
     self_sufficiency_standard_df = pl.DataFrame(sssMain(county_SelfSufficiencyStandard))

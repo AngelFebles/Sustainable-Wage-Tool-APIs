@@ -12,23 +12,32 @@ Job Salary Data: https://download.bls.gov/pub/time.series/oe/
 
 Job Educational Requirements: https://www.bls.gov/emp/tables/education-and-training-by-occupation.htm
 
-Before running the scripts, make sure to install the required packages. Run this command in the project's root folder:
+
+The project expects a file named "credentials.py" under the root directory of the project. 
+
+This file should have the string variable APIKEYHOUSING, which contains your Huduser API key. This is used to retrieve housing cost data. Refer to the [Housing Cost API](https://www.huduser.gov/portal/dataset/fmr-api.html) source mentioned above to learn how to create an API key.
+
+
+
+Before running the project, make sure to install the required dependecies. Run this command in the project's root folder:
 
 ```
 pip install -r requirements.txt
 ```
 
-This project uses argparse for county lookup. To initialize project run from the command line:
+This project uses argparse for county lookup. To initialize project, run from the command line in the root directory:
 
 ```
-python .\sustainable-wage-tool-data\__init__.py "county name"
+python sustainable_wage_tool_data "county name"
 ```
 
 Example: 
 
 ```
-python .\sustainable-wage-tool-data\__init__.py "racine"
+python sustainable_wage_tool_data "racine"
 ```
+
+
 
 Upon execution, project will output two files:
 
