@@ -34,7 +34,7 @@ def get_county_id(county):
 
     """
     
-    job_data_files_dir = os.path.join(os.path.dirname(__file__), '../JobDataFiles/oe.area')
+    job_data_files_dir = os.path.join(os.path.dirname(__file__), 'JobDataFiles/oe.area')
     absolute_pathJD = os.path.abspath(job_data_files_dir)
     
        
@@ -68,7 +68,7 @@ def dowload_job_salary_data(county):
     # Since we are downloading throught Chrome, files would normaly go to whatever download path you currently have.
     # The code below gets the absolute path of /DataFiles to change the download path there.
     
-    raw_files_dir = os.path.join(os.path.dirname(__file__), '../DataFiles')
+    raw_files_dir = os.path.join(os.path.dirname(__file__), '/DataFiles')
     absolute_path = os.path.abspath(raw_files_dir)
     prefs = {
     "download.default_directory": absolute_path,

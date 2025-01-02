@@ -1,12 +1,23 @@
-credentials.py
+sustainable_wage_tool_data/scripts/credentials.py
+
+__pycache__
 
 tempCodeRunnerFile.py
 
-/DataFiles/*
-!/DataFiles/countiesFIPSCodes.data
+sustainable_wage_tool_data/DataFiles/*
+!sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data
 
 *dataOutput.xlsx*
 
 *jobData.xlsx*
 
-__pycache__
+sustainable_wage_tool_data/scripts/__pycache__/*
+
+/build
+/dist
+/sustainable_wage_tool_data.egg-info
+make.bat
+Makefile
+
+
+credentials.py

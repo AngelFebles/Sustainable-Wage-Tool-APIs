@@ -5,3 +5,4 @@ Requests==2.32.3
 selenium==4.25.0
 XlsxWriter==3.2.0
 fastexcel
+argparse
