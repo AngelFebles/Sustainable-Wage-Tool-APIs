@@ -204,7 +204,7 @@ def splitCostList1(numberList):
     Examples
     --------
     >>> splitCostList1('$7.80\n$8.90')
-    [7.8, 8.9]
+    <<< [7.8, 8.9]
     """
     values = numberList.replace('$', '').split('\n')
     float_values = [float(value) for value in values]
