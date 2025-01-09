@@ -1,0 +1,16 @@
+<div class="lang-selector">
+    <<a id="es-link" href="#">ES</a> | <a id="en-link" href="#">EN</a>
+  
+    <script>
+      // Wait for the DOM to fully load before running the script
+      document.addEventListener('DOMContentLoaded', function() {
+        // Get the current page name (excluding file extension)
+        var currentFileName = window.location.pathname.split("/").pop().split(".")[0];
+    
+        // Generate language links dynamically
+        document.getElementById("es-link").href = "../es/" + currentFileName + ".html";
+        document.getElementById("en-link").href = "../en/" + currentFileName + ".html";
+      });
+    </script>
+    
+  </div>

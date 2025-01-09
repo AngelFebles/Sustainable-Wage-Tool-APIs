@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>jobDataScrapeSEL &#8212; sustainable_wage_tool_data  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../_static/groundwork.css?v=594d7a89" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sustainable_wage_tool_data  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jobDataScrapeSEL</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for jobDataScrapeSEL</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver</span> <span class="kn">import</span> <span class="n">Chrome</span><span class="p">,</span> <span class="n">ChromeOptions</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">xlsxwriter</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This file gets the job data (salaries, educational requirements, ...) from the BLS API using Selenium and BeautifulSoup.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">#county = &#39;Racine, WI&#39;</span>
+
+
+<div class="viewcode-block" id="get_county_id">
+<a class="viewcode-back" href="../jobDataScrapeSEL.html#jobDataScrapeSEL.get_county_id">[docs]</a>
+<span class="k">def</span> <span class="nf">get_county_id</span><span class="p">(</span><span class="n">county</span><span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a county name, this function returns the corresponding &#39;area_code&#39; value from the</span>
+<span class="sd">    &#39;oe.area&#39; file. This value is used to query the BLS API for data specific to the county.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    county : str</span>
+<span class="sd">        The name of the county for which the &#39;area_code&#39; needs to be retrieved.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The &#39;area_code&#39; value for the given county.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">job_data_files_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;JobDataFiles/oe.area&#39;</span><span class="p">)</span>
+    <span class="n">absolute_pathJD</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">job_data_files_dir</span><span class="p">)</span>
+    
+       
+    <span class="c1">#oe.area</span>
+    <span class="n">counties_df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">absolute_pathJD</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    
+    <span class="c1"># Look for the row containing the string county in the last column</span>
+    <span class="n">county_row</span> <span class="o">=</span> <span class="n">counties_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">counties_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">county</span><span class="p">)</span>
+    
+    <span class="c1"># Extract the value from the &#39;area_code&#39; column for the matched county row</span>
+    <span class="n">county_area_code</span> <span class="o">=</span> <span class="n">county_row</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;area_code&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">county_area_code</span></div>
+
+
+
+
+
+
+<div class="viewcode-block" id="dowload_job_salary_data">
+<a class="viewcode-back" href="../jobDataScrapeSEL.html#jobDataScrapeSEL.dowload_job_salary_data">[docs]</a>
+<span class="k">def</span> <span class="nf">dowload_job_salary_data</span><span class="p">(</span><span class="n">county</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    BLS is very strick with bot activity and automatic data scraping. </span>
+<span class="sd">    It prevents using tools like raw Beautiful Soup to download files.</span>
+<span class="sd">    </span>
+<span class="sd">    To go around this, we are going to open an instance of Chrome using Selenium and simulate user activity in the page to download a file.   </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://download.bls.gov/pub/time.series/oe/&#39;</span>
+    
+    
+    <span class="c1"># Since we are downloading throught Chrome, files would normaly go to whatever download path you currently have.</span>
+    <span class="c1"># The code below gets the absolute path of /DataFiles to change the download path there.</span>
+    
+    <span class="n">raw_files_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;/DataFiles&#39;</span><span class="p">)</span>
+    <span class="n">absolute_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">raw_files_dir</span><span class="p">)</span>
+    <span class="n">prefs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;download.default_directory&quot;</span><span class="p">:</span> <span class="n">absolute_path</span><span class="p">,</span>
+    <span class="s2">&quot;download.directory_upgrade&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;download.prompt_for_download&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">chromeOptions</span> <span class="o">=</span> <span class="n">ChromeOptions</span><span class="p">()</span>
+    <span class="n">chromeOptions</span><span class="o">.</span><span class="n">add_experimental_option</span><span class="p">(</span><span class="s2">&quot;prefs&quot;</span><span class="p">,</span> <span class="n">prefs</span><span class="p">)</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">Chrome</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">chromeOptions</span><span class="p">)</span>
+    
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Downloading job data...&#39;</span><span class="p">)</span>
+        <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">By</span><span class="o">.</span><span class="n">XPATH</span><span class="p">,</span> <span class="s2">&quot;//a[@href=</span><span class="se">\&quot;</span><span class="s2">/pub/time.series/oe/oe.data.1.AllData</span><span class="se">\&quot;</span><span class="s2">]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="c1"># Close the browser</span>
+        
+        <span class="c1"># Wait until file is downloaded before closing chrome</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">absolute_path</span><span class="p">,</span> <span class="s1">&#39;oe.data.1.AllData&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Waiting for download to finish...&#39;</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            
+        
+        
+        <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+    <span class="c1">#print(file_path)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">file_to_df</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">county</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">df</span></div>
+
+        
+    <span class="c1">#return file_to_df(absolute_path)</span>
+
+<div class="viewcode-block" id="split_df">
+<a class="viewcode-back" href="../jobDataScrapeSEL.html#jobDataScrapeSEL.split_df">[docs]</a>
+<span class="k">def</span> <span class="nf">split_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">county</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a DataFrame with job data, this function filters it to only include data from the specific County.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : polars.DataFrame</span>
+<span class="sd">        The DataFrame to filter.</span>
+<span class="sd">        </span>
+<span class="sd">    Not a parameter, but a global variable:</span>
+<span class="sd">    </span>
+<span class="sd">    county_id : str</span>
+<span class="sd">        The &#39;area_code&#39; value for the county of interest.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    polars.DataFrame</span>
+<span class="sd">        The filtered DataFrame containing only data from Racine County.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">county_id</span> <span class="o">=</span> <span class="n">get_county_id</span><span class="p">(</span><span class="n">county</span><span class="p">)</span>
+
+    <span class="n">county_header</span> <span class="o">=</span> <span class="s1">&#39;OEUM00&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">county_id</span><span class="p">)</span>
+    <span class="c1">#print(county_header)</span>
+
+    <span class="n">df_only_from_county</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;series_id                     &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">county_header</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">df_only_from_county</span></div>
+
+
+
+<div class="viewcode-block" id="file_to_df">
+<a class="viewcode-back" href="../jobDataScrapeSEL.html#jobDataScrapeSEL.file_to_df">[docs]</a>
+<span class="k">def</span> <span class="nf">file_to_df</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">county</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a file downloaded from the BLS website and processes it into a Polars DataFrame with 17 columns.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        The path to the file to read.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    polars.DataFrame</span>
+<span class="sd">        The processed DataFrame with 17 columns.</span>
+<span class="sd">    </span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The function first reads the file into a DataFrame, then filters it to only include data from the specific County.</span>
+<span class="sd">    It then reshapes the data from a single column of 17 values per job to a DataFrame with 17 columns.</span>
+<span class="sd">    Finally, it creates a column of job IDs and assigns them to the DataFrame.</span>
+<span class="sd">    </span>
+<span class="sd">    All the commented out print statements are for debugging purposes.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">raw_df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1">#drop the &quot;comments&quot; column</span>
+    <span class="n">raw_df</span> <span class="o">=</span> <span class="n">raw_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">raw_df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1">#Remove front and back characters (series identifiers) so we only have duplicates of the job id</span>
+    
+    <span class="n">raw_df</span> <span class="o">=</span> <span class="n">raw_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;series_id                     &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="mi">4</span><span class="p">,)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;idCounty&quot;</span><span class="p">))</span>
+    <span class="n">raw_df</span> <span class="o">=</span> <span class="n">raw_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;idCounty&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="o">-</span><span class="mi">19</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;idCounty&quot;</span><span class="p">))</span>
+
+    <span class="c1">#print(raw_df)</span>
+   
+    <span class="n">df_only_from_county</span> <span class="o">=</span> <span class="n">split_df</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">county</span><span class="p">)</span>
+    
+    <span class="c1">#take the column with all the data</span>
+    <span class="n">df_only_from_county_only_data</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;values&quot;</span><span class="p">:</span> <span class="n">df_only_from_county</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">df_only_from_county</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="p">})</span>
+
+    
+    <span class="c1">#jobIDs</span>
+    <span class="n">df_only_from_county_onlyIDS</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s2">&quot;ids&quot;</span><span class="p">:</span> <span class="n">df_only_from_county</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">df_only_from_county</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="p">})</span>
+    
+    <span class="c1"># print(&#39;A&#39;)</span>
+    <span class="c1"># print(df_only_from_county_only_data)</span>
+    
+    <span class="c1">#print(df_only_from_county_onlyIDS)</span>
+<span class="w">    </span>
+<span class="w">        </span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The list returns everything in a single column.</span>
+<span class="sd">    </span>
+<span class="sd">    We need to reshape and redistribute the elements into the 17 respective categories of each job</span>
+<span class="sd">    </span>
+<span class="sd">    We also need to have a single jobID per job, as oposed to 1 jobid per each job caterogry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1">######Reshaping data######</span>
+    
+    <span class="n">original_column</span> <span class="o">=</span> <span class="n">df_only_from_county_only_data</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+    <span class="c1"># Calculate the number of complete rows in the new DataFrame</span>
+    <span class="n">num_complete_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_column</span><span class="p">)</span> <span class="o">//</span> <span class="mi">17</span>
+
+    <span class="c1"># Reshape the array</span>
+    <span class="n">reshaped_array</span> <span class="o">=</span> <span class="n">original_column</span><span class="p">[:</span><span class="n">num_complete_rows</span> <span class="o">*</span> <span class="mi">17</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">17</span><span class="p">)</span>
+
+    <span class="c1"># Create column names</span>
+    <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;col_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">18</span><span class="p">)]</span>
+
+    <span class="c1"># Create the new DataFrame</span>
+    <span class="n">reshaped_df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">reshaped_array</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+
+
+    <span class="c1">#print(df_only_from_county_onlyIDS)</span>
+    
+    <span class="c1">######Creating jobIDs######</span>
+    <span class="c1">#print(df_only_from_county_onlyIDS)</span>
+    <span class="c1">#Remove front and back characters (series identifiers) so we only have duplicates of the job id</span>
+    <span class="n">df_only_from_county_onlyIDS</span> <span class="o">=</span> <span class="n">df_only_from_county_onlyIDS</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;ids&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;ids&quot;</span><span class="p">))</span>
+
+    <span class="n">df_only_from_county_onlyIDS</span> <span class="o">=</span> <span class="n">df_only_from_county_onlyIDS</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;ids&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="o">-</span><span class="mi">17</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;ids&quot;</span><span class="p">))</span>
+
+    <span class="c1">#print(df_only_from_county_onlyIDS)</span>
+    <span class="c1"># print(&#39;B&#39;)</span>
+    <span class="c1"># print(df_only_from_county_onlyIDS)</span>
+    
+    <span class="c1">#Delete duplicates of jobIDs</span>
+    <span class="n">df_only_from_county_onlyIDS</span> <span class="o">=</span> <span class="n">df_only_from_county_onlyIDS</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="s2">&quot;ids&quot;</span><span class="p">,</span><span class="n">maintain_order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    
+   
+
+
+
+    <span class="c1">#print(df_only_from_county_onlyIDS)</span>
+    
+    
+
+    <span class="n">combined_df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_only_from_county_onlyIDS</span><span class="p">,</span> <span class="n">reshaped_df</span><span class="p">],</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">)</span>
+    <span class="n">combined_df</span> <span class="o">=</span> <span class="n">combined_df</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span>
+        <span class="s2">&quot;col_1&quot;</span><span class="p">:</span> <span class="s2">&quot;Employment&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_2&quot;</span><span class="p">:</span> <span class="s2">&quot;Employment percent relative standard error&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_3&quot;</span><span class="p">:</span> <span class="s2">&quot;Hourly mean wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_4&quot;</span><span class="p">:</span> <span class="s2">&quot;Annual mean wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_5&quot;</span><span class="p">:</span> <span class="s2">&quot;Wage percent relative standard error&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_6&quot;</span><span class="p">:</span> <span class="s2">&quot;Hourly 10th percentile wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_7&quot;</span><span class="p">:</span> <span class="s2">&quot;Hourly 25th percentile wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_8&quot;</span><span class="p">:</span> <span class="s2">&quot;Hourly median wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_9&quot;</span><span class="p">:</span> <span class="s2">&quot;Hourly 75th percentile wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_10&quot;</span><span class="p">:</span> <span class="s2">&quot;Hourly 90th percentile wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_11&quot;</span><span class="p">:</span> <span class="s2">&quot;Annual 10th percentile wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_12&quot;</span><span class="p">:</span> <span class="s2">&quot;Annual 25th percentile wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_13&quot;</span><span class="p">:</span> <span class="s2">&quot;Annual median wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_14&quot;</span><span class="p">:</span> <span class="s2">&quot;Annual 75th percentile wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_15&quot;</span><span class="p">:</span> <span class="s2">&quot;Annual 90th percentile wage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_16&quot;</span><span class="p">:</span> <span class="s2">&quot;Employment per 1,000 jobs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;col_17&quot;</span><span class="p">:</span> <span class="s2">&quot;Location Quotient&quot;</span>
+    <span class="p">})</span>
+    
+    <span class="k">return</span> <span class="n">combined_df</span></div>
+
+    
+
+<div class="viewcode-block" id="get_education_requirements">
+<a class="viewcode-back" href="../jobDataScrapeSEL.html#jobDataScrapeSEL.get_education_requirements">[docs]</a>
+<span class="k">def</span> <span class="nf">get_education_requirements</span><span class="p">():</span>
+    <span class="c1"># Set up selenium</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scrapes the Bureau of Labor Statistics (BLS) website to extract education and training requirements</span>
+<span class="sd">    by occupation, and returns the data as a Polars DataFrame.</span>
+
+<span class="sd">    The function uses Selenium to navigate to the BLS webpage and retrieve the HTML content. BeautifulSoup </span>
+<span class="sd">    is then used to parse the page and find the relevant table containing education requirements. The table </span>
+<span class="sd">    data is extracted, cleaned, and converted into a Polars DataFrame, with the last row and column removed </span>
+<span class="sd">    as they contain non-essential information.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    polars.DataFrame</span>
+<span class="sd">        A DataFrame containing education and training requirements by occupation, with each column </span>
+<span class="sd">        representing a different attribute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://www.bls.gov/emp/tables/education-and-training-by-occupation.htm&#39;</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">()</span>
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="c1"># Get the table</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;regular&#39;</span><span class="p">})</span>
+
+    <span class="c1"># Extract the data</span>
+    <span class="n">df_education_requirements</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+    <span class="c1"># Extract data from the table and create a DataFrame</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">max_length</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;tr&#39;</span><span class="p">):</span>
+        <span class="n">elements_in_row</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">find_all</span><span class="p">([</span><span class="s1">&#39;td&#39;</span><span class="p">,</span> <span class="s1">&#39;th&#39;</span><span class="p">])</span>
+        <span class="n">elements_in_row</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">elements_in_row</span> <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">elements_in_row</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_length</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">elements_in_row</span><span class="p">))</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elements_in_row</span><span class="p">)</span>
+
+    <span class="c1"># Pad rows with empty values if necessary</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">))</span>
+
+    <span class="n">df_education_requirements</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;row&quot;</span><span class="p">)</span>
+
+
+
+    <span class="c1"># Deletes the last row (Its the sources of the info)</span>
+    <span class="n">df_education_requirements</span> <span class="o">=</span> <span class="n">df_education_requirements</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Delete the last column (its links to a pdf_education_requirements)</span>
+    <span class="n">df_education_requirements</span> <span class="o">=</span> <span class="n">df_education_requirements</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">df_education_requirements</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="c1">#Remove the &#39;-&#39; from the SOC code</span>
+    <span class="n">df_education_requirements</span> <span class="o">=</span> <span class="n">df_education_requirements</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">df_education_requirements</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="n">df_education_requirements</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df_education_requirements</span></div>
+
+
+
+<div class="viewcode-block" id="jobDataScrapeStarter">
+<a class="viewcode-back" href="../jobDataScrapeSEL.html#jobDataScrapeSEL.jobDataScrapeStarter">[docs]</a>
+<span class="k">def</span> <span class="nf">jobDataScrapeStarter</span><span class="p">(</span><span class="n">county</span><span class="p">):</span>
+    <span class="n">job_data_df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dowload_job_salary_data</span><span class="p">(</span><span class="n">county</span><span class="p">))</span>
+    <span class="n">educational_requirements_df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">get_education_requirements</span><span class="p">())</span> 
+
+    <span class="k">with</span> <span class="n">xlsxwriter</span><span class="o">.</span><span class="n">Workbook</span><span class="p">(</span><span class="s2">&quot;jobData.xlsx&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">workbook</span><span class="p">:</span>
+        <span class="n">job_data_df</span><span class="o">.</span><span class="n">write_excel</span><span class="p">(</span><span class="n">workbook</span><span class="o">=</span><span class="n">workbook</span><span class="p">,</span><span class="n">worksheet</span><span class="o">=</span><span class="s1">&#39;Job_Data&#39;</span><span class="p">)</span>
+        <span class="n">educational_requirements_df</span><span class="o">.</span><span class="n">write_excel</span><span class="p">(</span><span class="n">workbook</span><span class="o">=</span><span class="n">workbook</span><span class="p">,</span><span class="n">worksheet</span><span class="o">=</span><span class="s1">&#39;Education_Requirements&#39;</span><span class="p">)</span></div>
+
+    
+    
+
+<span class="c1">#jobDataScrapeStarter()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sustainable_wage_tool_data  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">jobDataScrapeSEL</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Higher Expectations.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

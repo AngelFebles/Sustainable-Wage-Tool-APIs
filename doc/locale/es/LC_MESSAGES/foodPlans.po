@@ -1,0 +1,214 @@
+# Sustainable Wage Tool APIS.
+# Copyright (C) 2025, Higher Expectations
+# This file is distributed under the same license as the
+# sustainable_wage_tool_data package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sustainable_wage_tool_data \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-09 07:16-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.15.0\n"
+
+#: ../../foodPlans.rst:2
+msgid "foodPlans module"
+msgstr "Módulo de planes de alimentación (foodPlans)"
+
+#: foodPlans.foodPlansmain:1 of
+msgid ""
+"This function scrapes the USDA website for the most recent food plans and"
+" returns the weekly and monthly cost of each plan"
+msgstr "Esta función rastrea el sitio web del USDA en busca de los planes de alimentación más recientes y devuelve el costo semanal y mensual de cada plan."
+
+#: foodPlans.foodPlansmain:3 of
+msgid ""
+"These food plans are at a federal level, so it doesn't change for "
+"different counties."
+msgstr "Estos planes alimentarios son a nivel federal, por lo que no cambian para los diferentes condados."
+
+#: foodPlans.foodPlansmain:5 of
+msgid ""
+"The function returns @fused_df, a polars dataframe with the following "
+"columns:"
+msgstr "La función devuelve @fused_df, un marco de datos polares con las siguientes columnas:"
+
+#: foodPlans.foodPlansmain:6 of
+msgid ""
+"Cohorts Age Age Cohort Thrifty Monthly Low Monthly     M Moderate Monthly"
+" Liberal Monthly"
+msgstr "Cohortes Edad Edad Cohorte Plan Ahorro Mensual Bajo Mensual Moderado Mensual Liberal Mensual"
+
+#: foodPlans.foodPlansmain:14 of
+msgid ""
+"Representing the monthly costs for different food plans divided by age "
+"group and cohort"
+msgstr "Representación de los costos mensuales de diferentes planes de alimentación divididos por grupo de edad y cohorte"
+
+#: foodPlans.fuse_food_plans:1 of
+msgid ""
+"Fuse two DataFrames from the thrifty and low-to-liberal food plans into "
+"one."
+msgstr "Fusionar dos DataFrames de los planes alimentarios ahorrativos y de bajos a liberales en uno."
+
+#: ../../foodPlans.rst foodPlans.splitCostList1 foodPlans.splitGroupList1 of
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: foodPlans.fuse_food_plans:3 of
+msgid ""
+"A DataFrame with columns 'Age', 'Weekly cost', and 'Monthly cost' for the"
+" thrifty plan."
+msgstr "Un DataFrame con las columnas 'Age', 'Weekly cost', y 'Monthly cost' para el plan de bajo consumo."
+
+#: foodPlans.fuse_food_plans:5 of
+msgid ""
+"A DataFrame with columns 'Age', 'Weekly cost low', 'Weekly cost "
+"moderate', 'Weekly cost liberal', 'Monthly cost low', 'Monthly cost "
+"moderate', and 'Monthly cost liberal' for the low-to-liberal plan."
+msgstr "Un DataFrame con las columnas 'Age', 'Weekly cost low', 'Weekly cost moderate', 'Weekly cost liberal', 'Monthly cost low', 'Monthly cost moderate', y 'Monthly cost liberal' para el plan low-to-liberal."
+
+#: ../../foodPlans.rst foodPlans.splitCostList1 foodPlans.splitGroupList1 of
+msgid "Returns"
+msgstr "La función devuelve:"
+
+#: foodPlans.fuse_food_plans:8 of
+msgid ""
+"A DataFrame with columns 'Cohorts', 'Age', 'Age Cohort', 'Thrifty "
+"Monthly', 'Low Monthly', 'Moderate Monthly', and 'Liberal Monthly'."
+msgstr "Un DataFrame con las columnas 'Cohorts', 'Age', 'Age Cohort', 'Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', y 'Liberal Monthly'."
+
+#: ../../foodPlans.rst foodPlans.splitCostList1 foodPlans.splitGroupList1 of
+msgid "Return type"
+msgstr "Tipo de retorno"
+
+#: foodPlans.getAgeCohortMeans:1 of
+msgid "Calculate the mean of each food plan for each age group."
+msgstr "Calcular el promedio de cada plan alimentario para cada grupo de edad."
+
+#: foodPlans.getAgeCohortMeans:3 of
+msgid ""
+"A DataFrame with columns 'Age', 'Age Cohort', 'Thrifty Monthly', 'Low "
+"Monthly', 'Moderate Monthly', and 'Liberal Monthly' for the fused food "
+"plans."
+msgstr "Un DataFrame con las columnas 'Age', 'Age Cohort', 'Thrifty Monthly', 'Low Monthly', 'Moderate Monthly', y 'Liberal Monthly' para los planes alimentarios fusionados."
+
+#: foodPlans.getAgeCohortMeans:6 of
+msgid ""
+"A DataFrame with columns 'Age Cohort', 'Thrifty', 'Low', 'Moderate', and "
+"'Liberal' with the mean of each food plan for each age group."
+msgstr "Un DataFrame con las columnas 'Age Cohort', 'Thrifty', 'Low', 'Moderate', y 'Liberal' con el promedio de cada plan alimentario para cada grupo de edad."
+
+#: foodPlans.getLowLiberalTable:1 of
+msgid ""
+"This function takes a link to the most recent low-liberal plan and "
+"returns a polars DataFrame with the following columns:"
+msgstr "Esta función toma un enlace al plan más reciente de bajo a liberal y devuelve un DataFrame de polars con las siguientes columnas:"
+
+#: foodPlans.getLowLiberalTable:3 of
+msgid ""
+"Age, Weekly cost low, Weekly cost moderate, Weekly cost liberal, Monthly "
+"cost low, Monthly cost moderate, Monthly cost liberal"
+msgstr "Age, Weekly cost low, Weekly cost moderate, Weekly cost liberal, Monthly cost low, Monthly cost moderate, Monthly cost liberal"
+
+#: foodPlans.getLowLiberalTable:6 of
+msgid ""
+"Columns can be referenced as dictionary keys, so for example, to print "
+"the weekly low cost of the moderate plan you do:"
+msgstr "Las columnas se pueden referenciar como claves de diccionario, así que, por ejemplo, para imprimir el costo semanal bajo del plan moderado haces:"
+
+#: foodPlans.getLowLiberalTable:7 of
+msgid "print(low_to_liberaldf['Weekly cost low'])"
+msgstr "print(low_to_liberaldf['Weekly cost low'])"
+
+#: foodPlans.getLowLiberalTable:9 foodPlans.getThriftyTable:8 of
+msgid "And you can also get the nth value of a column by using its index:"
+msgstr "Y también puedes obtener el enésimo valor de una columna usando su índice:"
+
+#: foodPlans.getLowLiberalTable:10 of
+msgid "print(low_to_liberaldf['Weekly cost low'][0])"
+msgstr "print(low_to_liberaldf['Weekly cost low'][0])"
+
+#: foodPlans.getThriftyTable:1 of
+msgid ""
+"This function takes a link to the most recent thrifty plan and returns a "
+"polars DataFrame with the following columns:"
+msgstr "Esta función toma un enlace al plan más reciente de bajo consumo y devuelve un DataFrame de polars con las siguientes columnas:"
+
+#: foodPlans.getThriftyTable:3 of
+msgid "Age-sex group, Weekly cost, Monthly cost"
+msgstr "Age-sex group, Weekly cost, Monthly cost"
+
+#: foodPlans.getThriftyTable:5 of
+msgid ""
+"Columns can be referenced as dictionary keys, so for example, to print "
+"the weekly cost of the thrifty plan you do:"
+msgstr "Las columnas se pueden referenciar como claves de diccionario, así que, por ejemplo, para imprimir el costo semanal del plan de bajo consumo haces:"
+
+#: foodPlans.getThriftyTable:6 of
+msgid "print(thrifthy_plan['Weekly cost'])"
+msgstr "print(thrifthy_plan['Weekly cost'])"
+
+#: foodPlans.getThriftyTable:9 of
+msgid "print(thrifthy_plan['Weekly cost'][0])"
+msgstr "print(thrifthy_plan['Weekly cost'][0])"
+
+#: foodPlans.splitCostList1:1 of
+msgid "Split a string of numbers with dollar signs into a list of floats."
+msgstr "Dividir una cadena de números con signos de dólar en una lista de flotantes."
+
+#: foodPlans.splitCostList1:3 of
+msgid "A string of numbers with dollar signs, separated by newlines."
+msgstr "Una cadena de números con signos de dólar, separados por saltos de línea."
+
+#: foodPlans.splitCostList1:6 of
+msgid "A list of floats."
+msgstr "Una lista de flotantes."
+
+#: foodPlans.splitCostList1:10 foodPlans.splitGroupList1:10 of
+msgid "Examples"
+msgstr "Ejemplos"
+
+#: foodPlans.splitGroupList1:1 of
+msgid "Splits a string of age group labels into a list of individual age ranges."
+msgstr "Divide una cadena de etiquetas de grupos de edad en una lista de rangos de edad individuales."
+
+#: foodPlans.splitGroupList1:3 of
+msgid ""
+"A string containing age group labels separated by newlines, with an "
+"\"Individual\" label at the start."
+msgstr "Una cadena que contiene etiquetas de grupos de edad separadas por saltos de línea, con una etiqueta \"Individual\" al principio."
+
+#: foodPlans.splitGroupList1:6 of
+msgid ""
+"A list containing age ranges for child, male, and female groups, "
+"excluding headers."
+msgstr "Una lista que contiene rangos de edad para grupos de niños, hombres y mujeres, excluyendo encabezados."
+oodPlans.rst foodPlans.splitCostList1 foodPlans.splitGroupList1 of
+msgid "Parameters"
+msgstr "Parametros"
+
+#: foodPlans.fuse_food_plans:3 of
+msgid ""
+"A DataFrame with columns 'Age', 'Weekly cost', and 'Monthly cost' for the"
+" thrifty plan."
+msgstr "Un DataFrame con las columnas 'Age', 'Weekly cost', y 'Monthly cost' para el plan de bajo consumo"
+
+#: foodPlans.fuse_food_plans:5 of
+msgid ""
+"A DataFrame with columns 'Age', 'Weekly cost low', 'Weekly cost "
+"moderate', 'Weekly cost liberal', 'Monthly cost low', 'Monthly cost "
+"moderate', and 'Monthly cost liberal' for the low-to-liberal plan."
+msgstr "Un DataFrame con las columnas 'Age', 'Weekly cost low', 'Weekly cost "
+"moderate', 'Weekly cost liberal', 'Monthly cost low', 'Monthly cost "
+"moderate', y 'Monthly cost liberal' para el plan low-to-liberal"
+

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>foodPlans &#8212; sustainable_wage_tool_data  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../_static/groundwork.css?v=594d7a89" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sustainable_wage_tool_data  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">foodPlans</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for foodPlans</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">pdfplumber</span>
+<span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">xlsxwriter</span>
+
+
+<span class="c1">#This script will scrape the USDA website for the most recent food plans and return the weekly and monthly cost of each plan</span>
+
+
+<div class="viewcode-block" id="foodPlansmain">
+<a class="viewcode-back" href="../foodPlans.html#foodPlans.foodPlansmain">[docs]</a>
+<span class="k">def</span> <span class="nf">foodPlansmain</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function scrapes the USDA website for the most recent food plans and returns the weekly and monthly cost of each plan</span>
+
+<span class="sd">    These food plans are at a federal level, so it doesn&#39;t change for different counties.</span>
+
+<span class="sd">    The function returns @fused_df, a polars dataframewith the following columns:</span>
+<span class="sd">        Cohorts	</span>
+<span class="sd">        Age	</span>
+<span class="sd">        Age Cohort	</span>
+<span class="sd">        Thrifty Monthly	</span>
+<span class="sd">        Low Monthly	M</span>
+<span class="sd">        Moderate Monthly	</span>
+<span class="sd">        Liberal Monthly</span>
+<span class="sd">        </span>
+<span class="sd">    Representing the monthly costs for different food plans divided by age group and cohort</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">foodPlansHomePage</span> <span class="o">=</span> <span class="s1">&#39;https://www.fns.usda.gov/cnpp/usda-food-plans-cost-food-monthly-reports&#39;</span>
+    <span class="n">rSoup</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">foodPlansHomePage</span><span class="p">)</span>
+
+    <span class="c1">#raw web data</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">rSoup</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+
+    <span class="c1">#The table containing all pdfs with food plans</span>
+    <span class="n">tableSoup</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;tbody&#39;</span><span class="p">)</span>
+
+    <span class="c1">#The first row of the table contains the most recent food plan</span>
+    <span class="n">firstRow</span> <span class="o">=</span> <span class="n">tableSoup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;tr&#39;</span><span class="p">)</span>
+
+    <span class="c1">#First row is always federal thrifty, and second is always federal low-liberal</span>
+    <span class="n">thriftyPlanRaw</span> <span class="o">=</span> <span class="n">firstRow</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+    <span class="n">lowToLiberalPlanRaw</span> <span class="o">=</span> <span class="n">thriftyPlanRaw</span><span class="o">.</span><span class="n">find_next_sibling</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+
+
+
+    <span class="c1">#Links to most recent plan pdfs</span>
+    
+    <span class="n">linkToThriftyPlan</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.fns.usda.gov</span><span class="si">{</span><span class="n">thriftyPlanRaw</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">linkToLowLiberalPlan</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://www.fns.usda.gov</span><span class="si">{</span><span class="n">lowToLiberalPlanRaw</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+
+    <span class="c1">#Most recent food plan data</span>
+    <span class="c1">#See comment below for more info</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Getting Food Plan Cost data....&#39;</span><span class="p">)</span>
+    
+    <span class="n">thrifthy_plan</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">getThriftyTable</span><span class="p">(</span><span class="n">linkToThriftyPlan</span><span class="p">))</span>
+    <span class="n">low_to_lib_plan</span> <span class="o">=</span> <span class="n">getLowLiberalTable</span><span class="p">(</span><span class="n">linkToLowLiberalPlan</span><span class="p">)</span>
+
+<span class="w">    </span>
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    getThriftyTable and getLowLiberalTable return polars dataframes with the following columns:</span>
+
+<span class="sd">        getThriftyTable:</span>
+<span class="sd">            Age-sex group, Weekly cost, Monthly cost</span>
+
+<span class="sd">        getLowLiberalTable:</span>
+<span class="sd">            Age-sex group, Weekly cost low, Weekly cost moderate, Weekly cost liberal, </span>
+<span class="sd">            Monthly cost low, Monthly cost moderate, Monthly cost liberal</span>
+
+<span class="sd">    Columns can be referenced as dictionary keys, so for example, to print the weekly cost of the thrifty plan you do:</span>
+<span class="sd">        print(thrifthy_plan[&#39;Weekly cost&#39;])</span>
+
+<span class="sd">    And you can also get the nth value of a column by using its index:</span>
+<span class="sd">        print(thrifthy_plan[&#39;Weekly cost&#39;][0]) </span>
+<span class="sd">  </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1">#print(thrifthy_plan)</span>
+    
+    
+    
+    
+    <span class="n">fused_df</span> <span class="o">=</span> <span class="n">fuse_food_plans</span><span class="p">(</span><span class="n">thrifthy_plan</span><span class="p">,</span> <span class="n">low_to_lib_plan</span><span class="p">)</span>
+    <span class="c1">#means_df = getAgeCohortMeans(fused_df)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Done!&#39;</span><span class="p">)</span>
+    
+    <span class="c1">#print(low_to_lib_plan)</span>
+    
+    <span class="k">return</span> <span class="n">fused_df</span></div>
+
+
+
+ 
+
+<div class="viewcode-block" id="getThriftyTable">
+<a class="viewcode-back" href="../foodPlans.html#foodPlans.getThriftyTable">[docs]</a>
+<span class="k">def</span> <span class="nf">getThriftyTable</span><span class="p">(</span><span class="n">linkToThriftyPlan</span><span class="p">):</span>
+    <span class="c1">#Thirfty plan to raw text</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function takes a link to the most recent thrifty plan and returns a polars DataFrame with the following columns:</span>
+
+<span class="sd">        Age-sex group, Weekly cost, Monthly cost</span>
+
+<span class="sd">    Columns can be referenced as dictionary keys, so for example, to print the weekly cost of the thrifty plan you do:</span>
+<span class="sd">        print(thrifthy_plan[&#39;Weekly cost&#39;])</span>
+
+<span class="sd">    And you can also get the nth value of a column by using its index:</span>
+<span class="sd">        print(thrifthy_plan[&#39;Weekly cost&#39;][0]) </span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">rPDF</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">linkToThriftyPlan</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">rPDF</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="n">pdfplumber</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+        <span class="n">first_page</span> <span class="o">=</span> <span class="n">pdf</span><span class="o">.</span><span class="n">pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="n">first_page</span><span class="o">.</span><span class="n">extract_tables</span><span class="p">()</span>
+    
+    <span class="n">thirftyTableGroupSingle</span> <span class="o">=</span> <span class="n">splitGroupList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">thirftyTableWeeklySingle</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">thirftyTableMonthlySingle</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="c1">#thirftyTableGroupFamily = tables[0][2][0]</span>
+    <span class="n">thirftyTableWeeklyFamily</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">thirftyTableMonthlyFamily</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="c1">#ageGroups = [&#39;Child&#39;] * 5 + [&quot;Male&quot;] * 5 + [&quot;Female&quot;] * 5 + [&quot;Family&quot;]</span>
+      
+    <span class="n">thrifty_df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="c1"># &#39;Cohorts&#39;: ageGroups,</span>
+        <span class="c1"># &#39;Age&#39; : thirftyTableGroupSingle + [&#39;Reference Family&#39;],</span>
+        <span class="c1"># &#39;Weekly cost&#39; : thirftyTableWeeklySingle + thirftyTableWeeklyFamily,</span>
+        <span class="c1"># &#39;Monthly cost&#39; : thirftyTableMonthlySingle + thirftyTableMonthlyFamily</span>
+        
+        <span class="s1">&#39;Age&#39;</span> <span class="p">:</span> <span class="n">thirftyTableGroupSingle</span> <span class="p">,</span>
+        <span class="s1">&#39;Weekly cost&#39;</span> <span class="p">:</span> <span class="n">thirftyTableWeeklySingle</span> <span class="p">,</span>
+        <span class="s1">&#39;Monthly cost&#39;</span> <span class="p">:</span> <span class="n">thirftyTableMonthlySingle</span>
+    <span class="p">})</span>
+
+
+    <span class="k">return</span> <span class="n">thrifty_df</span></div>
+
+
+<div class="viewcode-block" id="getLowLiberalTable">
+<a class="viewcode-back" href="../foodPlans.html#foodPlans.getLowLiberalTable">[docs]</a>
+<span class="k">def</span> <span class="nf">getLowLiberalTable</span><span class="p">(</span><span class="n">linkToLowLiberalPlan</span><span class="p">):</span>
+      <span class="c1">#Low to Liberal plan to raw text</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function takes a link to the most recent low-liberal plan and returns a polars DataFrame with the following columns:</span>
+
+<span class="sd">        Age, Weekly cost low, Weekly cost moderate, Weekly cost liberal, </span>
+<span class="sd">        Monthly cost low, Monthly cost moderate, Monthly cost liberal</span>
+
+<span class="sd">    Columns can be referenced as dictionary keys, so for example, to print the weekly low cost of the moderate plan you do:</span>
+<span class="sd">        print(low_to_liberaldf[&#39;Weekly cost low&#39;])</span>
+
+<span class="sd">    And you can also get the nth value of a column by using its index:</span>
+<span class="sd">        print(low_to_liberaldf[&#39;Weekly cost low&#39;][0]) </span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">rPDF</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">linkToLowLiberalPlan</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">rPDF</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+    
+    <span class="k">with</span> <span class="n">pdfplumber</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+        <span class="n">first_page</span> <span class="o">=</span> <span class="n">pdf</span><span class="o">.</span><span class="n">pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="n">first_page</span><span class="o">.</span><span class="n">extract_tables</span><span class="p">()</span>
+    
+    <span class="c1"># Split the values into groups:</span>
+    <span class="n">age_gender_groups</span> <span class="o">=</span> <span class="n">splitGroupList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">weekly_low</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">weekly_moderate</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">weekly_liberal</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">monthly_low</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span>
+    <span class="n">monthly_moderate</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">5</span><span class="p">])</span>
+    <span class="n">monthly_liberal</span> <span class="o">=</span> <span class="n">splitCostList1</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">6</span><span class="p">])</span>
+
+    
+    <span class="n">low_to_liberaldf</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Age&#39;</span><span class="p">:</span> <span class="n">age_gender_groups</span><span class="p">,</span>
+        <span class="s1">&#39;Weekly cost low&#39;</span><span class="p">:</span> <span class="n">weekly_low</span><span class="p">,</span>
+        <span class="s1">&#39;Weekly cost moderate&#39;</span><span class="p">:</span> <span class="n">weekly_moderate</span><span class="p">,</span>
+        <span class="s1">&#39;Weekly cost liberal&#39;</span><span class="p">:</span> <span class="n">weekly_liberal</span><span class="p">,</span>
+        <span class="s1">&#39;Monthly cost low&#39;</span><span class="p">:</span> <span class="n">monthly_low</span><span class="p">,</span>
+        <span class="s1">&#39;Monthly cost moderate&#39;</span><span class="p">:</span> <span class="n">monthly_moderate</span><span class="p">,</span>
+        <span class="s1">&#39;Monthly cost liberal&#39;</span><span class="p">:</span> <span class="n">monthly_liberal</span>
+    <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">low_to_liberaldf</span></div>
+
+
+   
+
+    
+<div class="viewcode-block" id="splitCostList1">
+<a class="viewcode-back" href="../foodPlans.html#foodPlans.splitCostList1">[docs]</a>
+<span class="k">def</span> <span class="nf">splitCostList1</span><span class="p">(</span><span class="n">numberList</span><span class="p">):</span>
+<span class="w"> </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Split a string of numbers with dollar signs into a list of floats.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    numberList : str</span>
+<span class="sd">        A string of numbers with dollar signs, separated by newlines.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of floats.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; splitCostList1(&#39;$7.80\\n$8.90&#39;)</span>
+<span class="sd">    &lt;&lt;&lt; [7.8, 8.9]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">numberList</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">float_values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+        
+    <span class="k">return</span> <span class="n">float_values</span> </div>
+
+
+
+<div class="viewcode-block" id="splitGroupList1">
+<a class="viewcode-back" href="../foodPlans.html#foodPlans.splitGroupList1">[docs]</a>
+<span class="k">def</span> <span class="nf">splitGroupList1</span><span class="p">(</span><span class="n">groupList</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits a string of age group labels into a list of individual age ranges.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    groupList : str</span>
+<span class="sd">        A string containing age group labels separated by newlines, with an &quot;Individual&quot; label at the start.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list containing age ranges for child, male, and female groups, excluding headers.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; splitGroupList1(&#39;Individuals\\nChild Header\\nChild 1\\nChild 2\\n...&#39;) </span>
+<span class="sd">    &lt;&lt;&lt;[&#39;Child 1&#39;, &#39;Child 2&#39;, ...&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">groupList</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        
+    <span class="c1">#Remove the &quot;Individual&quot; label</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    
+    <span class="c1"># removing headers (Child, Male, Female)</span>
+    <span class="n">child_ages</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+    <span class="n">male_ages</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">7</span><span class="p">:</span><span class="mi">12</span><span class="p">]</span>
+    <span class="n">female_ages</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">13</span><span class="p">:]</span>
+
+    <span class="c1"># Create a 2D array</span>
+    <span class="n">food_plan_header</span> <span class="o">=</span> <span class="n">child_ages</span><span class="o">+</span><span class="n">male_ages</span><span class="o">+</span><span class="n">female_ages</span>
+
+    <span class="k">return</span> <span class="n">food_plan_header</span></div>
+
+
+
+<div class="viewcode-block" id="fuse_food_plans">
+<a class="viewcode-back" href="../foodPlans.html#foodPlans.fuse_food_plans">[docs]</a>
+<span class="k">def</span> <span class="nf">fuse_food_plans</span><span class="p">(</span><span class="n">thrifthy_plan</span><span class="p">,</span> <span class="n">low_to_lib_plan</span><span class="p">):</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fuse two DataFrames from the thrifty and low-to-liberal food plans into one.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    thrifthy_plan : polars.DataFrame</span>
+<span class="sd">        A DataFrame with columns &#39;Age&#39;, &#39;Weekly cost&#39;, and &#39;Monthly cost&#39; for the thrifty plan.</span>
+<span class="sd">    low_to_lib_plan : polars.DataFrame</span>
+<span class="sd">        A DataFrame with columns &#39;Age&#39;, &#39;Weekly cost low&#39;, &#39;Weekly cost moderate&#39;, &#39;Weekly cost liberal&#39;, &#39;Monthly cost low&#39;, &#39;Monthly cost moderate&#39;, and &#39;Monthly cost liberal&#39; for the low-to-liberal plan.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    polars.DataFrame</span>
+<span class="sd">        A DataFrame with columns &#39;Cohorts&#39;, &#39;Age&#39;, &#39;Age Cohort&#39;, &#39;Thrifty Monthly&#39;, &#39;Low Monthly&#39;, &#39;Moderate Monthly&#39;, and &#39;Liberal Monthly&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ageGroups</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Child&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;Male&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;Female&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span>
+    <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Infant&quot;</span><span class="p">,</span> <span class="s2">&quot;Preschooler&quot;</span><span class="p">,</span> <span class="s2">&quot;Preschooler&quot;</span><span class="p">,</span> <span class="s2">&quot;School Age&quot;</span><span class="p">,</span> <span class="s2">&quot;School Age&quot;</span><span class="p">,</span> <span class="s2">&quot;School Age&quot;</span><span class="p">,</span> <span class="s2">&quot;Teenager&quot;</span><span class="p">,</span> <span class="s2">&quot;Adult&quot;</span><span class="p">,</span> <span class="s2">&quot;Senior&quot;</span><span class="p">,</span> <span class="s2">&quot;Senior&quot;</span><span class="p">,</span> <span class="s2">&quot;School Age&quot;</span><span class="p">,</span> <span class="s2">&quot;Teenager&quot;</span><span class="p">,</span> <span class="s2">&quot;Adult&quot;</span><span class="p">,</span> <span class="s2">&quot;Senior&quot;</span><span class="p">,</span> <span class="s2">&quot;Senior&quot;</span><span class="p">]</span>
+
+    
+    
+    <span class="c1">#print(low_to_lib_plan)</span>
+        
+    <span class="n">fusedDF</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Cohorts&#39;</span><span class="p">:</span> <span class="n">ageGroups</span><span class="p">,</span>
+        <span class="s1">&#39;Age&#39;</span><span class="p">:</span> <span class="n">low_to_lib_plan</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">],</span>
+        <span class="s1">&#39;Age Cohort&#39;</span><span class="p">:</span> <span class="n">categories</span><span class="p">,</span>
+        <span class="s1">&#39;Thrifty Monthly&#39;</span> <span class="p">:</span> <span class="n">thrifthy_plan</span><span class="p">[</span><span class="s2">&quot;Monthly cost&quot;</span><span class="p">],</span>
+        <span class="s1">&#39;Low Monthly&#39;</span> <span class="p">:</span> <span class="n">low_to_lib_plan</span><span class="p">[</span><span class="s2">&quot;Monthly cost low&quot;</span><span class="p">],</span>
+        <span class="s1">&#39;Moderate Monthly&#39;</span> <span class="p">:</span> <span class="n">low_to_lib_plan</span><span class="p">[</span><span class="s2">&quot;Monthly cost moderate&quot;</span><span class="p">],</span>
+        <span class="s1">&#39;Liberal Monthly&#39;</span> <span class="p">:</span> <span class="n">low_to_lib_plan</span><span class="p">[</span><span class="s2">&quot;Monthly cost liberal&quot;</span><span class="p">]</span>
+    <span class="p">})</span>
+    <span class="c1">#print(fusedDF)</span>
+    
+    <span class="c1">#meansDF = getAgeCohortMeans(fusedDF)</span>
+
+    <span class="k">return</span> <span class="n">fusedDF</span></div>
+
+
+<div class="viewcode-block" id="getAgeCohortMeans">
+<a class="viewcode-back" href="../foodPlans.html#foodPlans.getAgeCohortMeans">[docs]</a>
+<span class="k">def</span> <span class="nf">getAgeCohortMeans</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the mean of each food plan for each age group.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : polars.DataFrame</span>
+<span class="sd">        A DataFrame with columns &#39;Age&#39;, &#39;Age Cohort&#39;, &#39;Thrifty Monthly&#39;, &#39;Low Monthly&#39;, &#39;Moderate Monthly&#39;, and &#39;Liberal Monthly&#39; for the fused food plans.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    polars.DataFrame</span>
+<span class="sd">        A DataFrame with columns &#39;Age Cohort&#39;, &#39;Thrifty&#39;, &#39;Low&#39;, &#39;Moderate&#39;, and &#39;Liberal&#39; with the mean of each food plan for each age group.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Calculating food plan means...&#39;</span><span class="p">)</span>
+    <span class="n">meansDF</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({})</span>
+    
+    <span class="c1">#The default order of the intialage cohort rows is the one below, but we&#39;ll need to change it later to be compatible with the Self Sufficiency Standard</span>
+    <span class="c1">#Could change to doing the final order from the beggining but this makes it more readable</span>
+    
+    <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Infant&quot;</span><span class="p">,</span> <span class="s2">&quot;Preschooler&quot;</span><span class="p">,</span> <span class="s2">&quot;School Age&quot;</span><span class="p">,</span> <span class="s2">&quot;Teenager&quot;</span><span class="p">,</span> <span class="s2">&quot;Adult&quot;</span><span class="p">,</span> <span class="s2">&quot;Senior&quot;</span><span class="p">]</span>
+
+    
+    <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">category</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">,</span><span class="s1">&#39;Thrifty Monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;Low Monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;Moderate Monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;Liberal Monthly&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">meansDF</span> <span class="o">=</span> <span class="n">meansDF</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span>
+
+
+    <span class="n">meansDF</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">([</span><span class="s1">&#39;Thrifty Monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;Low Monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;Moderate Monthly&#39;</span><span class="p">,</span> <span class="s1">&#39;Liberal Monthly&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>      
+    <span class="n">meansDF</span> <span class="o">=</span> <span class="n">meansDF</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span>
+        <span class="s1">&#39;Thrifty Monthly&#39;</span><span class="p">:</span> <span class="s1">&#39;Thrifty&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Low Monthly&#39;</span><span class="p">:</span> <span class="s1">&#39;Low&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Moderate Monthly&#39;</span><span class="p">:</span> <span class="s1">&#39;Moderate&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Liberal Monthly&#39;</span><span class="p">:</span> <span class="s1">&#39;Liberal&#39;</span>
+    <span class="p">})</span>
+    
+    <span class="c1">#Change the format of the columns to be compatible with the Self Sufficiency Standard</span>
+    
+    <span class="c1">#Pop Senior</span>
+    <span class="n">meansDF</span> <span class="o">=</span> <span class="n">meansDF</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;Senior&#39;</span><span class="p">)</span>
+    
+    <span class="c1">#The new order must be Adult(s)	Infant(s) Preshooler(s)	Schoolager(s) Teenager(s)</span>
+    <span class="n">adult_row</span> <span class="o">=</span> <span class="n">meansDF</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Adult&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span>
+    <span class="n">infant_row</span> <span class="o">=</span> <span class="n">meansDF</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Infant&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span>
+    <span class="n">preschooler_row</span> <span class="o">=</span> <span class="n">meansDF</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Preschooler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span>
+    <span class="n">schoolager_row</span> <span class="o">=</span> <span class="n">meansDF</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;School Age&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span>
+    <span class="n">teenager_row</span> <span class="o">=</span> <span class="n">meansDF</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;Age Cohort&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;Teenager&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span>
+    
+    <span class="n">meansDF</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">adult_row</span><span class="p">,</span> <span class="n">infant_row</span><span class="p">,</span> <span class="n">preschooler_row</span><span class="p">,</span> <span class="n">schoolager_row</span><span class="p">,</span> <span class="n">teenager_row</span><span class="p">])</span>
+    
+    <span class="c1">#meansDF = meansDF.filter(pl.col(&#39;Age Cohort&#39;) != &#39;Adult&#39;)</span>
+
+    
+    <span class="c1">#meansDF = pl.concat([adult_row, meansDF])</span>
+
+      
+   
+    <span class="c1">#print(meansDF)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Done!&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">meansDF</span></div>
+
+
+    
+
+<span class="c1">#foodPlansmain()</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sustainable_wage_tool_data  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">foodPlans</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Higher Expectations.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Módulo jobDataScrapeSEL (jobDataScrapeSEL) &#8212; documentación de sustainable_wage_tool_data - </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/groundwork.css?v=594d7a89" />
+    <script src="_static/documentation_options.js?v=e2bb6099"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Módulo monthlyBudget (monthlyBudget)" href="monthlyBudget.html" />
+    <link rel="prev" title="Módulo de costo de vivienda (housingCost)" href="housingCost.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="monthlyBudget.html" title="Módulo monthlyBudget (monthlyBudget)"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="housingCost.html" title="Módulo de costo de vivienda (housingCost)"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de sustainable_wage_tool_data - </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">sustainable_wage_tool_data</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Módulo jobDataScrapeSEL (jobDataScrapeSEL)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-jobDataScrapeSEL">
+<span id="jobdatascrapesel-module"></span><h1>Módulo jobDataScrapeSEL (jobDataScrapeSEL)<a class="headerlink" href="#module-jobDataScrapeSEL" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="jobDataScrapeSEL.dowload_job_salary_data">
+<span class="sig-prename descclassname"><span class="pre">jobDataScrapeSEL.</span></span><span class="sig-name descname"><span class="pre">dowload_job_salary_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">county</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jobDataScrapeSEL.html#dowload_job_salary_data"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#jobDataScrapeSEL.dowload_job_salary_data" title="Link to this definition">¶</a></dt>
+<dd><p>BLS is very strick with bot activity and automatic data scraping.
+It prevents using tools like raw Beautiful Soup to download files.</p>
+<p>Para solucionar esto, vamos a abrir una instancia de Chrome utilizando Selenium y simular actividad de usuario en la página para descargar un archivo.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jobDataScrapeSEL.file_to_df">
+<span class="sig-prename descclassname"><span class="pre">jobDataScrapeSEL.</span></span><span class="sig-name descname"><span class="pre">file_to_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">county</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jobDataScrapeSEL.html#file_to_df"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#jobDataScrapeSEL.file_to_df" title="Link to this definition">¶</a></dt>
+<dd><p>Lee un archivo descargado del sitio web de BLS y lo procesa en un DataFrame de Polars con 17 columnas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – La ruta del archivo que se debe leer.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>El DataFrame procesado con 17 columnas.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>polars.DataFrame</p>
+</dd>
+</dl>
+<p class="rubric">Notas</p>
+<p>La función primero lee el archivo en un DataFrame, luego lo filtra para incluir solo datos del condado específico. Luego, reorganiza los datos de una sola columna de 17 valores por trabajo a un DataFrame con 17 columnas. Finalmente, crea una columna de IDs de trabajo y los asigna al DataFrame.</p>
+<p>Todas las declaraciones de impresión comentadas son para propósitos de depuración.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jobDataScrapeSEL.get_county_id">
+<span class="sig-prename descclassname"><span class="pre">jobDataScrapeSEL.</span></span><span class="sig-name descname"><span class="pre">get_county_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">county</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jobDataScrapeSEL.html#get_county_id"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#jobDataScrapeSEL.get_county_id" title="Link to this definition">¶</a></dt>
+<dd><p>Dado un nombre de condado, esta función devuelve el valor correspondiente de “area_code” del archivo “oe.area”. Este valor se utiliza para consultar la API de BLS para datos específicos del condado.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>county</strong> (<em>str</em>) – El nombre del condado para el cual se necesita obtener el “area_code”.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>El valor de “area_code” para el condado dado.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jobDataScrapeSEL.get_education_requirements">
+<span class="sig-prename descclassname"><span class="pre">jobDataScrapeSEL.</span></span><span class="sig-name descname"><span class="pre">get_education_requirements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/jobDataScrapeSEL.html#get_education_requirements"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#jobDataScrapeSEL.get_education_requirements" title="Link to this definition">¶</a></dt>
+<dd><p>Rastrea el sitio web del Bureau of Labor Statistics (BLS) para extraer los requisitos de educación y capacitación por ocupación, y devuelve los datos como un DataFrame de Polars.</p>
+<p>La función utiliza Selenium para navegar a la página web del BLS y recuperar el contenido HTML. Luego, BeautifulSoup se utiliza para analizar la página y encontrar la tabla relevante que contiene los requisitos de educación. Los datos de la tabla se extraen, limpian y convierten en un DataFrame de Polars, eliminando la última fila y columna, ya que contienen información no esencial.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Devuelve<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Un DataFrame que contiene los requisitos de educación y capacitación por ocupación, donde cada columna representa un atributo diferente.</p>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p>polars.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jobDataScrapeSEL.jobDataScrapeStarter">
+<span class="sig-prename descclassname"><span class="pre">jobDataScrapeSEL.</span></span><span class="sig-name descname"><span class="pre">jobDataScrapeStarter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">county</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jobDataScrapeSEL.html#jobDataScrapeStarter"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#jobDataScrapeSEL.jobDataScrapeStarter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="jobDataScrapeSEL.split_df">
+<span class="sig-prename descclassname"><span class="pre">jobDataScrapeSEL.</span></span><span class="sig-name descname"><span class="pre">split_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">county</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/jobDataScrapeSEL.html#split_df"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#jobDataScrapeSEL.split_df" title="Link to this definition">¶</a></dt>
+<dd><p>Dado un DataFrame con datos de trabajos, esta función lo filtra para incluir solo datos del condado específico.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>polars.DataFrame</em>) – El DataFrame a filtrar.</p></li>
+<li><p><strong>parameter</strong> (<em>Not a</em>)</p></li>
+<li><p><strong>variable</strong> (<em>but a global</em>)</p></li>
+<li><p><strong>county_id</strong> (<em>str</em>) – El valor de “area_code” para el condado de interés.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>El DataFrame filtrado que contiene solo datos del condado de Racine.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>polars.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Módulo jobDataScrapeSEL (jobDataScrapeSEL)</a><ul>
+<li><a class="reference internal" href="#jobDataScrapeSEL.dowload_job_salary_data"><code class="docutils literal notranslate"><span class="pre">dowload_job_salary_data()</span></code></a></li>
+<li><a class="reference internal" href="#jobDataScrapeSEL.file_to_df"><code class="docutils literal notranslate"><span class="pre">file_to_df()</span></code></a></li>
+<li><a class="reference internal" href="#jobDataScrapeSEL.get_county_id"><code class="docutils literal notranslate"><span class="pre">get_county_id()</span></code></a></li>
+<li><a class="reference internal" href="#jobDataScrapeSEL.get_education_requirements"><code class="docutils literal notranslate"><span class="pre">get_education_requirements()</span></code></a></li>
+<li><a class="reference internal" href="#jobDataScrapeSEL.jobDataScrapeStarter"><code class="docutils literal notranslate"><span class="pre">jobDataScrapeStarter()</span></code></a></li>
+<li><a class="reference internal" href="#jobDataScrapeSEL.split_df"><code class="docutils literal notranslate"><span class="pre">split_df()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="housingCost.html"
+                          title="capítulo anterior">Módulo de costo de vivienda (housingCost)</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="monthlyBudget.html"
+                          title="próximo capítulo">Módulo monthlyBudget (monthlyBudget)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/jobDataScrapeSEL.rst.txt"
+            rel="nofollow">Mostrar el código</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Búsqueda rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<div class="lang-selector">
+  <<a id="es-link" href="#">ES</a> | <a id="en-link" href="#">EN</a>
+  <script>
+    // Wait for the DOM to fully load before running the script
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get the current page name (excluding file extension)
+      var currentFileName = window.location.pathname.split("/").pop().split(".")[0];
+  
+      // Generate language links dynamically
+      document.getElementById("es-link").href = "../es/" + currentFileName + ".html";
+      document.getElementById("en-link").href = "../en/" + currentFileName + ".html";
+    });
+  </script>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             >índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="monthlyBudget.html" title="Módulo monthlyBudget (monthlyBudget)"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="housingCost.html" title="Módulo de costo de vivienda (housingCost)"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de sustainable_wage_tool_data - </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >sustainable_wage_tool_data</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Módulo jobDataScrapeSEL (jobDataScrapeSEL)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Higher Expectations.
+      Creado usando <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

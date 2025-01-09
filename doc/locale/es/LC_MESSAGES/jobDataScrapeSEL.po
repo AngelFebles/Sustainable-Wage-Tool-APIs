@@ -1,0 +1,135 @@
+# Sustainable Wage Tool APIS.
+# Copyright (C) 2025, Higher Expectations
+# This file is distributed under the same license as the
+# sustainable_wage_tool_data package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sustainable_wage_tool_data \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-09 07:16-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.15.0\n"
+
+#: ../../jobDataScrapeSEL.rst:2
+msgid "jobDataScrapeSEL module"
+msgstr "Módulo jobDataScrapeSEL (jobDataScrapeSEL)"
+
+#: jobDataScrapeSEL.dowload_job_salary_data:1 of
+msgid ""
+"BLS is very strict with bot activity and automatic data scraping. It "
+"prevents using tools like raw Beautiful Soup to download files."
+msgstr "BLS es muy estricto con la actividad de bots y la extracción automática de datos. Impide el uso de herramientas como Beautiful Soup sin procesar para descargar archivos."
+
+#: jobDataScrapeSEL.dowload_job_salary_data:4 of
+msgid ""
+"To go around this, we are going to open an instance of Chrome using "
+"Selenium and simulate user activity in the page to download a file."
+msgstr "Para solucionar esto, vamos a abrir una instancia de Chrome utilizando Selenium y simular actividad de usuario en la página para descargar un archivo."
+
+#: jobDataScrapeSEL.file_to_df:1 of
+msgid ""
+"Reads a file downloaded from the BLS website and processes it into a "
+"Polars DataFrame with 17 columns."
+msgstr "Lee un archivo descargado del sitio web de BLS y lo procesa en un DataFrame de Polars con 17 columnas."
+
+#: ../../jobDataScrapeSEL.rst jobDataScrapeSEL.file_to_df of
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: jobDataScrapeSEL.file_to_df:3 of
+msgid "The path to the file to read."
+msgstr "La ruta del archivo que se debe leer."
+
+#: ../../jobDataScrapeSEL.rst jobDataScrapeSEL.file_to_df of
+msgid "Returns"
+msgstr "Devuelve"
+
+#: jobDataScrapeSEL.file_to_df:6 of
+msgid "The processed DataFrame with 17 columns."
+msgstr "El DataFrame procesado con 17 columnas."
+
+#: ../../jobDataScrapeSEL.rst jobDataScrapeSEL.file_to_df of
+msgid "Return type"
+msgstr "Tipo de return"
+
+#: jobDataScrapeSEL.file_to_df:10 of
+msgid "Notes"
+msgstr "Notas"
+
+#: jobDataScrapeSEL.file_to_df:11 of
+msgid ""
+"The function first reads the file into a DataFrame, then filters it to "
+"only include data from the specific County. It then reshapes the data "
+"from a single column of 17 values per job to a DataFrame with 17 columns."
+" Finally, it creates a column of job IDs and assigns them to the "
+"DataFrame."
+msgstr "La función primero lee el archivo en un DataFrame, luego lo filtra para incluir solo datos del condado específico. Luego, reorganiza los datos de una sola columna de 17 valores por trabajo a un DataFrame con 17 columnas. Finalmente, crea una columna de IDs de trabajo y los asigna al DataFrame."
+
+#: jobDataScrapeSEL.file_to_df:15 of
+msgid "All the commented out print statements are for debugging purposes."
+msgstr "Todas las declaraciones de impresión comentadas son para propósitos de depuración."
+
+#: jobDataScrapeSEL.get_county_id:1 of
+msgid ""
+"Given a county name, this function returns the corresponding 'area_code' "
+"value from the 'oe.area' file. This value is used to query the BLS API "
+"for data specific to the county."
+msgstr "Dado un nombre de condado, esta función devuelve el valor correspondiente de 'area_code' del archivo 'oe.area'. Este valor se utiliza para consultar la API de BLS para datos específicos del condado."
+
+#: jobDataScrapeSEL.get_county_id:4 of
+msgid "The name of the county for which the 'area_code' needs to be retrieved."
+msgstr "El nombre del condado para el cual se necesita obtener el 'area_code'."
+
+#: jobDataScrapeSEL.get_county_id:7 of
+msgid "The 'area_code' value for the given county."
+msgstr "El valor de 'area_code' para el condado dado."
+
+#: jobDataScrapeSEL.get_education_requirements:1 of
+msgid ""
+"Scrapes the Bureau of Labor Statistics (BLS) website to extract education"
+" and training requirements by occupation, and returns the data as a "
+"Polars DataFrame."
+msgstr "Rastrea el sitio web del Bureau of Labor Statistics (BLS) para extraer los requisitos de educación y capacitación por ocupación, y devuelve los datos como un DataFrame de Polars."
+
+#: jobDataScrapeSEL.get_education_requirements:4 of
+msgid ""
+"The function uses Selenium to navigate to the BLS webpage and retrieve "
+"the HTML content. BeautifulSoup is then used to parse the page and find "
+"the relevant table containing education requirements. The table data is "
+"extracted, cleaned, and converted into a Polars DataFrame, with the last "
+"row and column removed as they contain non-essential information."
+msgstr "La función utiliza Selenium para navegar a la página web del BLS y recuperar el contenido HTML. Luego, BeautifulSoup se utiliza para analizar la página y encontrar la tabla relevante que contiene los requisitos de educación. Los datos de la tabla se extraen, limpian y convierten en un DataFrame de Polars, eliminando la última fila y columna, ya que contienen información no esencial."
+
+#: jobDataScrapeSEL.get_education_requirements:9 of
+msgid ""
+"A DataFrame containing education and training requirements by occupation,"
+" with each column representing a different attribute."
+msgstr "Un DataFrame que contiene los requisitos de educación y capacitación por ocupación, donde cada columna representa un atributo diferente."
+
+#: jobDataScrapeSEL.split_df:1 of
+msgid ""
+"Given a DataFrame with job data, this function filters it to only include"
+" data from the specific County."
+msgstr "Dado un DataFrame con datos de trabajos, esta función lo filtra para incluir solo datos del condado específico."
+
+#: jobDataScrapeSEL.split_df:3 of
+msgid "The DataFrame to filter."
+msgstr "El DataFrame a filtrar."
+
+#: jobDataScrapeSEL.split_df:7 of
+msgid "The 'area_code' value for the county of interest."
+msgstr "El valor de 'area_code' para el condado de interés."
+
+#: jobDataScrapeSEL.split_df:10 of
+msgid "The filtered DataFrame containing only data from Racine County."
+msgstr "El DataFrame filtrado que contiene solo datos del condado de Racine."

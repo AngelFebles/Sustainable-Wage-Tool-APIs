@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>monthlyBudget &#8212; sustainable_wage_tool_data  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="../_static/groundwork.css?v=594d7a89" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sustainable_wage_tool_data  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">monthlyBudget</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for monthlyBudget</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">polars</span> <span class="k">as</span> <span class="nn">pl</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      This is the last sheet to be generated in the output excel file.</span>
+<span class="sd">      </span>
+<span class="sd">      It adds up the costs from all other sheets to determine the monthly budget for each family type.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="monthlyBudgetMain">
+<a class="viewcode-back" href="../monthlyBudget.html#monthlyBudget.monthlyBudgetMain">[docs]</a>
+<span class="k">def</span> <span class="nf">monthlyBudgetMain</span><span class="p">(</span><span class="n">sssDf</span><span class="p">,</span> <span class="n">housingDF</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes the Self Sufficiency Standard DataFrame and the Housing Costs DataFrame to generate </span>
+<span class="sd">    the monthly budget for different family types and housing plans. </span>
+<span class="sd">    </span>
+<span class="sd">    It also takes into account the different food plans and their costs. (From foodPlans.py)</span>
+<span class="sd">    </span>
+<span class="sd">    The function returns a Polars DataFrame with the monthly budget for each family type and housing plan. </span>
+<span class="sd">    </span>
+<span class="sd">    The monthly budget includes the costs of the housing plan, the food plan, and other costs such as broadband and cell phone, health care costs, </span>
+<span class="sd">    transportation costs, and taxes. The function also subtracts the earned income tax credit, the child care tax credit, and the child tax credit from the monthly budget.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sssDf : Polars DataFrame</span>
+<span class="sd">        The Self Sufficiency Standard DataFrame, which contains the monthly costs for each family type and housing plan.</span>
+<span class="sd">    housingDF : Polars DataFrame</span>
+<span class="sd">        The Housing Costs DataFrame, which contains the costs of each housing plan.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Polars DataFrame</span>
+<span class="sd">        A Polars DataFrame with the monthly budget for each family type and housing plan.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">monthlyBudgetDf</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Getting Monthly Budget data....&#39;</span><span class="p">)</span>
+    
+
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">sssDf</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">sssDf</span><span class="o">.</span><span class="n">columns</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]))</span><span class="o">.</span><span class="n">fill_null</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span><span class="n">sssDf</span><span class="p">[</span><span class="s1">&#39;Broadband &amp; Cell Phone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;Broadband &amp; Cell Phone&#39;</span><span class="p">)])</span>
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span><span class="n">sssDf</span><span class="p">[</span><span class="s1">&#39;Health Care Costs &#39;</span><span class="p">]</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;Health Care Costs &#39;</span><span class="p">)])</span>
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span><span class="n">sssDf</span><span class="p">[</span><span class="s1">&#39;Transportation Costs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;Transportation Costs&#39;</span><span class="p">)])</span>
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span><span class="n">sssDf</span><span class="p">[</span><span class="s1">&#39;Child Care Costs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;Child Care Costs&#39;</span><span class="p">)])</span>
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span><span class="n">sssDf</span><span class="p">[</span><span class="s1">&#39;Taxes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;Taxes&#39;</span><span class="p">)])</span>
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span><span class="n">sssDf</span><span class="p">[</span><span class="s1">&#39;Earned Income Tax Credit (-)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;Earned Income Tax Credit (-)&#39;</span><span class="p">)])</span>
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span><span class="n">sssDf</span><span class="p">[</span><span class="s1">&#39;Child Care Tax Credit (-)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;Child Care Tax Credit (-)&#39;</span><span class="p">)])</span>
+    <span class="n">initial_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span><span class="n">sssDf</span><span class="p">[</span><span class="s1">&#39;Child Tax Credit (-)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;Child Tax Credit (-)&#39;</span><span class="p">)])</span>
+
+    
+
+    <span class="n">foodPlans</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Thrifty&#39;</span><span class="p">,</span> <span class="s1">&#39;Low&#39;</span><span class="p">,</span> <span class="s1">&#39;Moderate&#39;</span><span class="p">,</span> <span class="s1">&#39;Liberal&#39;</span><span class="p">]</span>
+       
+    <span class="c1">#For every housing plan, copy the whole family types table</span>
+    <span class="k">for</span> <span class="n">housingType</span><span class="p">,</span> <span class="n">housingCost</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">housingDF</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> <span class="n">housingDF</span><span class="p">[</span><span class="s1">&#39;Cost&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">foodPlan</span> <span class="ow">in</span> <span class="n">foodPlans</span><span class="p">:</span>
+             
+                <span class="n">temp_df</span> <span class="o">=</span> <span class="n">initial_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span>
+                    <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;Housing Selection&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">housingType</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_df</span><span class="p">)),</span>
+                    <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;Housing Costs&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">housingCost</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_df</span><span class="p">))</span>
+                <span class="p">])</span>
+                
+                <span class="n">temp_df</span> <span class="o">=</span> <span class="n">temp_df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span>
+                    <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;Food Selection&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">foodPlan</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">initial_df</span><span class="p">)),</span>
+                    <span class="c1">#pl.Series(&quot;Food Costs&quot;, getFoodCosts(len(initial_df)))</span>
+                <span class="p">])</span>
+                <span class="n">monthlyBudgetDf</span> <span class="o">=</span> <span class="n">monthlyBudgetDf</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">temp_df</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">monthlyBudgetDf</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">temp_df</span>
+                
+            <span class="c1">#pl.Series(&quot;Food Costs&quot;, getFoodCosts(len(initial_df)))</span>
+                      
+    <span class="n">monthlyBudgetDf</span> <span class="o">=</span> <span class="n">monthlyBudgetDf</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;Food Costs&quot;</span><span class="p">,</span> <span class="n">getFoodCosts</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">monthlyBudgetDf</span><span class="p">)))</span>
+    <span class="p">])</span>
+    
+    <span class="n">monthlyBudgetDf</span> <span class="o">=</span> <span class="n">monthlyBudgetDf</span><span class="o">.</span><span class="n">with_columns</span><span class="p">([</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="s2">&quot;Monthly Budget&quot;</span><span class="p">,</span> <span class="n">calculateMonthlyBudget</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">monthlyBudgetDf</span><span class="p">)))</span>
+    <span class="p">])</span>
+
+            
+    <span class="c1">#print(monthlyBudgetDf) </span>
+    
+    <span class="c1">#monthlyBudgetDf = getRestOfColumns(monthlyBudgetDf, sssDf)</span>
+        
+    <span class="k">return</span> <span class="n">monthlyBudgetDf</span></div>
+
+
+<div class="viewcode-block" id="getFoodCosts">
+<a class="viewcode-back" href="../monthlyBudget.html#monthlyBudget.getFoodCosts">[docs]</a>
+<span class="k">def</span> <span class="nf">getFoodCosts</span><span class="p">(</span><span class="n">listLength</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes a list length and returns a list of formulas for calculating the food costs column in the monthly budget dataframe.</span>
+<span class="sd">    </span>
+<span class="sd">    The formulas are based on the food means table and the housing selection, food selection, and family type columns in the monthly budget dataframe.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    listLength : int</span>
+<span class="sd">        The length of the list to be returned.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of formulas for calculating the food costs column in the monthly budget dataframe.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">foodCostsList</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    
+    <span class="c1">#This is an excel formula to calculate the monthly costs</span>
+    <span class="c1">#Code just adds the formula for each row, changing the elements used for the formula as needed</span>
+    
+    <span class="n">current_row</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">while</span> <span class="n">current_row</span> <span class="o">&lt;</span> <span class="n">listLength</span><span class="o">+</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">food_formula</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;=(HLOOKUP(&#39;Monthly Budget&#39;!Q</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">,Food_means!$A$1:$E$6,2,FALSE)*&#39;Monthly Budget&#39;!$B</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">) + (HLOOKUP(&#39;Monthly Budget&#39;!Q</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">,Food_means!$A$1:$E$6,3,FALSE)*&#39;Monthly Budget&#39;!$C</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">) + (HLOOKUP(&#39;Monthly Budget&#39;!Q</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">,Food_means!$A$1:$E$6,4,FALSE)*&#39;Monthly Budget&#39;!$D</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">) + (HLOOKUP(&#39;Monthly Budget&#39;!Q</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">,Food_means!$A$1:$E$6,5,FALSE)*&#39;Monthly Budget&#39;!$E</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">) + (HLOOKUP(&#39;Monthly Budget&#39;!Q</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">,Food_means!$A$1:$E$6,6,FALSE)*&#39;Monthly Budget&#39;!$F</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">)&#39;&#39;&#39;</span>
+            <span class="n">foodCostsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">food_formula</span><span class="p">)</span>
+            <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">foodCostsList</span></div>
+
+
+<div class="viewcode-block" id="calculateMonthlyBudget">
+<a class="viewcode-back" href="../monthlyBudget.html#monthlyBudget.calculateMonthlyBudget">[docs]</a>
+<span class="k">def</span> <span class="nf">calculateMonthlyBudget</span><span class="p">(</span><span class="n">listLength</span><span class="p">):</span>
+      
+    <span class="c1">#=SUM(G2:N2,P2,R2)</span>
+    <span class="n">monthlyBudgetList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_row</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">while</span> <span class="n">current_row</span> <span class="o">&lt;</span> <span class="n">listLength</span><span class="o">+</span><span class="mi">2</span><span class="p">:</span>
+            <span class="n">monthlyBudgetFormula</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;=SUM(G</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">:N</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">,P</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">,R</span><span class="si">{</span><span class="n">current_row</span><span class="si">}</span><span class="s1">)&#39;&#39;&#39;</span>
+            <span class="n">monthlyBudgetList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">monthlyBudgetFormula</span><span class="p">)</span>
+            <span class="n">current_row</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">monthlyBudgetList</span></div>
+
+
+
+<span class="c1">#def getRestOfColumns(monthlyBudgetDf, sssDf):</span>
+    
+    
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">sustainable_wage_tool_data  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">monthlyBudget</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Higher Expectations.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

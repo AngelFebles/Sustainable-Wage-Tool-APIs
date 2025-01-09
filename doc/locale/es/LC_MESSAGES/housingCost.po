@@ -1,0 +1,56 @@
+# Sustainable Wage Tool APIS.
+# Copyright (C) 2025, Higher Expectations
+# This file is distributed under the same license as the
+# sustainable_wage_tool_data package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: sustainable_wage_tool_data \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-09 07:16-0600\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.15.0\n"
+
+#: ../../housingCost.rst:2
+msgid "housingCost module"
+msgstr "Módulo de costo de vivienda (housingCost)"
+
+#: housingCost.housingCostMain:1 of
+msgid ""
+"Scrapes the HUD website to retrieve the most recent housing cost data for"
+" Racine, WI by default."
+msgstr "Extrae datos del sitio web de HUD para obtener los costos de vivienda más recientes para Racine, WI de forma predeterminada."
+
+#: housingCost.housingCostMain:3 of
+msgid ""
+"The function sends a GET request to the HUD API to fetch data for "
+"different bedroom sizes. If successful, it processes the JSON response "
+"into a Polars DataFrame containing housing costs for Efficiency, One-"
+"Bedroom, Two-Bedroom, Three-Bedroom, and Four-Bedroom types."
+msgstr "La función envía una solicitud GET a la API de HUD para obtener datos de diferentes tamaños de dormitorio. Si tiene éxito, procesa la respuesta JSON en un DataFrame de Polars que contiene costos de vivienda para tipos de Eficiencia, Un Dormitorio, Dos Dormitorios, Tres Dormitorios y Cuatro Dormitorios."
+
+#: housingCost.housingCostMain:7 of
+msgid ""
+"Returns: polars.DataFrame: A polars DataFrame with three columns, 'Type',"
+" 'Lookup', and 'Cost', representing housing costs for each type."
+msgstr "Devuelve: polars.DataFrame: Un DataFrame de Polars con tres columnas, 'Type', 'Lookup' y 'Cost', que representan los costos de vivienda para cada tipo."
+
+#: housingCost.housingCostMain:10 of
+msgid ""
+"Prints a message if the request fails, including the status code of the "
+"response."
+msgstr "Imprime un mensaje si la solicitud falla, incluyendo el código de estado de la respuesta."
+
+
+
+
+

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Módulo selfSufficiencyStandard (selfSufficiencyStandard) &#8212; documentación de sustainable_wage_tool_data - </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/groundwork.css?v=594d7a89" />
+    <script src="_static/documentation_options.js?v=e2bb6099"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="prev" title="Módulo monthlyBudget (monthlyBudget)" href="monthlyBudget.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="monthlyBudget.html" title="Módulo monthlyBudget (monthlyBudget)"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de sustainable_wage_tool_data - </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">sustainable_wage_tool_data</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Módulo selfSufficiencyStandard (selfSufficiencyStandard)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-selfSufficiencyStandard">
+<span id="selfsufficiencystandard-module"></span><h1>Módulo selfSufficiencyStandard (selfSufficiencyStandard)<a class="headerlink" href="#module-selfSufficiencyStandard" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="selfSufficiencyStandard.readFile">
+<span class="sig-prename descclassname"><span class="pre">selfSufficiencyStandard.</span></span><span class="sig-name descname"><span class="pre">readFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">county_SelfSufficiencyStandard</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selfSufficiencyStandard.html#readFile"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#selfSufficiencyStandard.readFile" title="Link to this definition">¶</a></dt>
+<dd><p>Lee un archivo de Excel usando Polars y extrae los datos del Estándar de Autosuficiencia.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) – La ruta al archivo de Excel.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="selfSufficiencyStandard.sssMain">
+<span class="sig-prename descclassname"><span class="pre">selfSufficiencyStandard.</span></span><span class="sig-name descname"><span class="pre">sssMain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">county_SelfSufficiencyStandard</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/selfSufficiencyStandard.html#sssMain"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#selfSufficiencyStandard.sssMain" title="Link to this definition">¶</a></dt>
+<dd><p>Recupera los datos del Estándar de Autosuficiencia desde el sitio web designado para Wisconsin.</p>
+<p>La función raspa el sitio web para encontrar el enlace al archivo más reciente del Estándar de Autosuficiencia, lo descarga si no está presente en el directorio “./DataFiles”, y lee el archivo para extraer los datos específicos del Condado de Racine. Los datos se procesan usando la función <cite>readFile</cite>, que lee el archivo en un DataFrame de Polars.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Devuelve<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Un DataFrame de Polars con los datos específicos del Condado extraídos del archivo del Estándar de Autosuficiencia.</p>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p>&#64;dataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Módulo selfSufficiencyStandard (selfSufficiencyStandard)</a><ul>
+<li><a class="reference internal" href="#selfSufficiencyStandard.readFile"><code class="docutils literal notranslate"><span class="pre">readFile()</span></code></a></li>
+<li><a class="reference internal" href="#selfSufficiencyStandard.sssMain"><code class="docutils literal notranslate"><span class="pre">sssMain()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="monthlyBudget.html"
+                          title="capítulo anterior">Módulo monthlyBudget (monthlyBudget)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/selfSufficiencyStandard.rst.txt"
+            rel="nofollow">Mostrar el código</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Búsqueda rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<div class="lang-selector">
+  <<a id="es-link" href="#">ES</a> | <a id="en-link" href="#">EN</a>
+  <script>
+    // Wait for the DOM to fully load before running the script
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get the current page name (excluding file extension)
+      var currentFileName = window.location.pathname.split("/").pop().split(".")[0];
+  
+      // Generate language links dynamically
+      document.getElementById("es-link").href = "../es/" + currentFileName + ".html";
+      document.getElementById("en-link").href = "../en/" + currentFileName + ".html";
+    });
+  </script>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             >índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="monthlyBudget.html" title="Módulo monthlyBudget (monthlyBudget)"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de sustainable_wage_tool_data - </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >sustainable_wage_tool_data</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Módulo selfSufficiencyStandard (selfSufficiencyStandard)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Higher Expectations.
+      Creado usando <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

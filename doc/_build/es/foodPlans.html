@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Módulo de planes de alimentación (foodPlans) &#8212; documentación de sustainable_wage_tool_data - </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/groundwork.css?v=594d7a89" />
+    <script src="_static/documentation_options.js?v=e2bb6099"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Módulo de costo de vivienda (housingCost)" href="housingCost.html" />
+    <link rel="prev" title="credentials module" href="credentials.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="housingCost.html" title="Módulo de costo de vivienda (housingCost)"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="credentials.html" title="credentials module"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de sustainable_wage_tool_data - </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">sustainable_wage_tool_data</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Módulo de planes de alimentación (foodPlans)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-foodPlans">
+<span id="foodplans-module"></span><h1>Módulo de planes de alimentación (foodPlans)<a class="headerlink" href="#module-foodPlans" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="foodPlans.foodPlansmain">
+<span class="sig-prename descclassname"><span class="pre">foodPlans.</span></span><span class="sig-name descname"><span class="pre">foodPlansmain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/foodPlans.html#foodPlansmain"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#foodPlans.foodPlansmain" title="Link to this definition">¶</a></dt>
+<dd><p>Esta función rastrea el sitio web del USDA en busca de los planes de alimentación más recientes y devuelve el costo semanal y mensual de cada plan.</p>
+<p>Estos planes alimentarios son a nivel federal, por lo que no cambian para los diferentes condados.</p>
+<dl class="simple">
+<dt>The function returns &#64;fused_df, a polars dataframewith the following columns:</dt><dd><p>Cohortes Edad Edad Cohorte Plan Ahorro Mensual Bajo Mensual Moderado Mensual Liberal Mensual</p>
+</dd>
+</dl>
+<p>Representación de los costos mensuales de diferentes planes de alimentación divididos por grupo de edad y cohorte</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="foodPlans.fuse_food_plans">
+<span class="sig-prename descclassname"><span class="pre">foodPlans.</span></span><span class="sig-name descname"><span class="pre">fuse_food_plans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thrifthy_plan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_to_lib_plan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/foodPlans.html#fuse_food_plans"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#foodPlans.fuse_food_plans" title="Link to this definition">¶</a></dt>
+<dd><p>Fusionar dos DataFrames de los planes alimentarios ahorrativos y de bajos a liberales en uno.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thrifthy_plan</strong> (<em>polars.DataFrame</em>) – Un DataFrame con las columnas “Age”, “Weekly cost”, y “Monthly cost” para el plan de bajo consumo.</p></li>
+<li><p><strong>low_to_lib_plan</strong> (<em>polars.DataFrame</em>) – Un DataFrame con las columnas “Age”, “Weekly cost low”, “Weekly cost moderate”, “Weekly cost liberal”, “Monthly cost low”, “Monthly cost moderate”, y “Monthly cost liberal” para el plan low-to-liberal.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Un DataFrame con las columnas “Cohorts”, “Age”, “Age Cohort”, “Thrifty Monthly”, “Low Monthly”, “Moderate Monthly”, y “Liberal Monthly”.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>polars.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="foodPlans.getAgeCohortMeans">
+<span class="sig-prename descclassname"><span class="pre">foodPlans.</span></span><span class="sig-name descname"><span class="pre">getAgeCohortMeans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/foodPlans.html#getAgeCohortMeans"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#foodPlans.getAgeCohortMeans" title="Link to this definition">¶</a></dt>
+<dd><p>Calcular el promedio de cada plan alimentario para cada grupo de edad.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>polars.DataFrame</em>) – Un DataFrame con las columnas “Age”, “Age Cohort”, “Thrifty Monthly”, “Low Monthly”, “Moderate Monthly”, y “Liberal Monthly” para los planes alimentarios fusionados.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Un DataFrame con las columnas “Age Cohort”, “Thrifty”, “Low”, “Moderate”, y “Liberal” con el promedio de cada plan alimentario para cada grupo de edad.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>polars.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="foodPlans.getLowLiberalTable">
+<span class="sig-prename descclassname"><span class="pre">foodPlans.</span></span><span class="sig-name descname"><span class="pre">getLowLiberalTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">linkToLowLiberalPlan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/foodPlans.html#getLowLiberalTable"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#foodPlans.getLowLiberalTable" title="Link to this definition">¶</a></dt>
+<dd><p>Esta función toma un enlace al plan más reciente de bajo a liberal y devuelve un DataFrame de polars con las siguientes columnas:</p>
+<blockquote>
+<div><p>Age, Weekly cost low, Weekly cost moderate, Weekly cost liberal,
+Monthly cost low, Monthly cost moderate, Monthly cost liberal</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Las columnas se pueden referenciar como claves de diccionario, así que, por ejemplo, para imprimir el costo semanal bajo del plan moderado haces:</dt><dd><p>print(low_to_liberaldf[“Weekly cost low”])</p>
+</dd>
+<dt>Y también puedes obtener el enésimo valor de una columna usando su índice:</dt><dd><p>print(low_to_liberaldf[“Weekly cost low”][0])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="foodPlans.getThriftyTable">
+<span class="sig-prename descclassname"><span class="pre">foodPlans.</span></span><span class="sig-name descname"><span class="pre">getThriftyTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">linkToThriftyPlan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/foodPlans.html#getThriftyTable"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#foodPlans.getThriftyTable" title="Link to this definition">¶</a></dt>
+<dd><p>Esta función toma un enlace al plan más reciente de bajo consumo y devuelve un DataFrame de polars con las siguientes columnas:</p>
+<blockquote>
+<div><p>Age-sex group, Weekly cost, Monthly cost</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Las columnas se pueden referenciar como claves de diccionario, así que, por ejemplo, para imprimir el costo semanal del plan de bajo consumo haces:</dt><dd><p>print(thrifthy_plan[“Weekly cost”])</p>
+</dd>
+<dt>Y también puedes obtener el enésimo valor de una columna usando su índice:</dt><dd><p>print(thrifthy_plan[“Weekly cost”][0])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="foodPlans.splitCostList1">
+<span class="sig-prename descclassname"><span class="pre">foodPlans.</span></span><span class="sig-name descname"><span class="pre">splitCostList1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numberList</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/foodPlans.html#splitCostList1"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#foodPlans.splitCostList1" title="Link to this definition">¶</a></dt>
+<dd><p>Dividir una cadena de números con signos de dólar en una lista de flotantes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>numberList</strong> (<em>str</em>) – Una cadena de números con signos de dólar, separados por saltos de línea.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Una lista de flotantes.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">Ejemplos</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">splitCostList1</span><span class="p">(</span><span class="s1">&#39;$7.80</span><span class="se">\n</span><span class="s1">$8.90&#39;</span><span class="p">)</span>
+<span class="go">&lt;&lt;&lt; [7.8, 8.9]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="foodPlans.splitGroupList1">
+<span class="sig-prename descclassname"><span class="pre">foodPlans.</span></span><span class="sig-name descname"><span class="pre">splitGroupList1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">groupList</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/foodPlans.html#splitGroupList1"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#foodPlans.splitGroupList1" title="Link to this definition">¶</a></dt>
+<dd><p>Divide una cadena de etiquetas de grupos de edad en una lista de rangos de edad individuales.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>groupList</strong> (<em>str</em>) – Una cadena que contiene etiquetas de grupos de edad separadas por saltos de línea, con una etiqueta «Individual» al principio.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Una lista que contiene rangos de edad para grupos de niños, hombres y mujeres, excluyendo encabezados.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">Ejemplos</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">splitGroupList1</span><span class="p">(</span><span class="s1">&#39;Individuals</span><span class="se">\n</span><span class="s1">Child Header</span><span class="se">\n</span><span class="s1">Child 1</span><span class="se">\n</span><span class="s1">Child 2</span><span class="se">\n</span><span class="s1">...&#39;</span><span class="p">)</span>
+<span class="go">&lt;&lt;&lt;[&#39;Child 1&#39;, &#39;Child 2&#39;, ...&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Módulo de planes de alimentación (foodPlans)</a><ul>
+<li><a class="reference internal" href="#foodPlans.foodPlansmain"><code class="docutils literal notranslate"><span class="pre">foodPlansmain()</span></code></a></li>
+<li><a class="reference internal" href="#foodPlans.fuse_food_plans"><code class="docutils literal notranslate"><span class="pre">fuse_food_plans()</span></code></a></li>
+<li><a class="reference internal" href="#foodPlans.getAgeCohortMeans"><code class="docutils literal notranslate"><span class="pre">getAgeCohortMeans()</span></code></a></li>
+<li><a class="reference internal" href="#foodPlans.getLowLiberalTable"><code class="docutils literal notranslate"><span class="pre">getLowLiberalTable()</span></code></a></li>
+<li><a class="reference internal" href="#foodPlans.getThriftyTable"><code class="docutils literal notranslate"><span class="pre">getThriftyTable()</span></code></a></li>
+<li><a class="reference internal" href="#foodPlans.splitCostList1"><code class="docutils literal notranslate"><span class="pre">splitCostList1()</span></code></a></li>
+<li><a class="reference internal" href="#foodPlans.splitGroupList1"><code class="docutils literal notranslate"><span class="pre">splitGroupList1()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="credentials.html"
+                          title="capítulo anterior">credentials module</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="housingCost.html"
+                          title="próximo capítulo">Módulo de costo de vivienda (housingCost)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/foodPlans.rst.txt"
+            rel="nofollow">Mostrar el código</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Búsqueda rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<div class="lang-selector">
+  <<a id="es-link" href="#">ES</a> | <a id="en-link" href="#">EN</a>
+  <script>
+    // Wait for the DOM to fully load before running the script
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get the current page name (excluding file extension)
+      var currentFileName = window.location.pathname.split("/").pop().split(".")[0];
+  
+      // Generate language links dynamically
+      document.getElementById("es-link").href = "../es/" + currentFileName + ".html";
+      document.getElementById("en-link").href = "../en/" + currentFileName + ".html";
+    });
+  </script>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             >índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="housingCost.html" title="Módulo de costo de vivienda (housingCost)"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="credentials.html" title="credentials module"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de sustainable_wage_tool_data - </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >sustainable_wage_tool_data</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Módulo de planes de alimentación (foodPlans)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Higher Expectations.
+      Creado usando <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

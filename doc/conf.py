@@ -11,11 +11,14 @@ import sys
 sys.path.insert(0, os.path.abspath('../sustainable_wage_tool_data'))
 
 project = 'sustainable_wage_tool_data'
-copyright = '2025, Angel Febles'
+copyright = '2025, Higher Expectations'
 author = 'Angel Febles'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+languages = ['en', 'es']
+language = 'en'  # Default language
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -23,9 +26,9 @@ extensions = [
     'sphinx.ext.viewcode'
 ]
 
-templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+templates_path = ['templates']
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -33,3 +36,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'groundwork'
 html_static_path = ['_static']
+
+locale_dirs = ['./locale/']   
+gettext_compact = False     

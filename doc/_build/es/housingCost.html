@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Módulo de costo de vivienda (housingCost) &#8212; documentación de sustainable_wage_tool_data - </title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/groundwork.css?v=594d7a89" />
+    <script src="_static/documentation_options.js?v=e2bb6099"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Módulo jobDataScrapeSEL (jobDataScrapeSEL)" href="jobDataScrapeSEL.html" />
+    <link rel="prev" title="Módulo de planes de alimentación (foodPlans)" href="foodPlans.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="jobDataScrapeSEL.html" title="Módulo jobDataScrapeSEL (jobDataScrapeSEL)"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="foodPlans.html" title="Módulo de planes de alimentación (foodPlans)"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de sustainable_wage_tool_data - </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">sustainable_wage_tool_data</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Módulo de costo de vivienda (housingCost)</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-housingCost">
+<span id="housingcost-module"></span><h1>Módulo de costo de vivienda (housingCost)<a class="headerlink" href="#module-housingCost" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="housingCost.housingCostMain">
+<span class="sig-prename descclassname"><span class="pre">housingCost.</span></span><span class="sig-name descname"><span class="pre">housingCostMain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">countyCode_HousingCost</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apiKey_HousingCost</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/housingCost.html#housingCostMain"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#housingCost.housingCostMain" title="Link to this definition">¶</a></dt>
+<dd><p>Extrae datos del sitio web de HUD para obtener los costos de vivienda más recientes para Racine, WI de forma predeterminada.</p>
+<p>La función envía una solicitud GET a la API de HUD para obtener datos de diferentes tamaños de dormitorio. Si tiene éxito, procesa la respuesta JSON en un DataFrame de Polars que contiene costos de vivienda para tipos de Eficiencia, Un Dormitorio, Dos Dormitorios, Tres Dormitorios y Cuatro Dormitorios.</p>
+<p>Devuelve: polars.DataFrame: Un DataFrame de Polars con tres columnas, “Type”, “Lookup” y “Cost”, que representan los costos de vivienda para cada tipo.</p>
+<p>Imprime un mensaje si la solicitud falla, incluyendo el código de estado de la respuesta.</p>
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Módulo de costo de vivienda (housingCost)</a><ul>
+<li><a class="reference internal" href="#housingCost.housingCostMain"><code class="docutils literal notranslate"><span class="pre">housingCostMain()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="foodPlans.html"
+                          title="capítulo anterior">Módulo de planes de alimentación (foodPlans)</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="jobDataScrapeSEL.html"
+                          title="próximo capítulo">Módulo jobDataScrapeSEL (jobDataScrapeSEL)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/housingCost.rst.txt"
+            rel="nofollow">Mostrar el código</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Búsqueda rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<div class="lang-selector">
+  <<a id="es-link" href="#">ES</a> | <a id="en-link" href="#">EN</a>
+  <script>
+    // Wait for the DOM to fully load before running the script
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get the current page name (excluding file extension)
+      var currentFileName = window.location.pathname.split("/").pop().split(".")[0];
+  
+      // Generate language links dynamically
+      document.getElementById("es-link").href = "../es/" + currentFileName + ".html";
+      document.getElementById("en-link").href = "../en/" + currentFileName + ".html";
+    });
+  </script>
+</div>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             >índice</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Índice de Módulos Python"
+             >módulos</a> |</li>
+        <li class="right" >
+          <a href="jobDataScrapeSEL.html" title="Módulo jobDataScrapeSEL (jobDataScrapeSEL)"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="foodPlans.html" title="Módulo de planes de alimentación (foodPlans)"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de sustainable_wage_tool_data - </a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >sustainable_wage_tool_data</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Módulo de costo de vivienda (housingCost)</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Higher Expectations.
+      Creado usando <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>
