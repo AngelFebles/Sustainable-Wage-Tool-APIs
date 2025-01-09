@@ -13,7 +13,7 @@ def housingCostMain(countyCode_HousingCost, apiKey_HousingCost):
     for Efficiency, One-Bedroom, Two-Bedroom, Three-Bedroom, and Four-Bedroom types.
     
     Returns:
-        @df: A polars DataFrame with three columns, 'Type', 'Lookup', and 'Cost', representing housing costs for each type.
+    polars.DataFrame: A polars DataFrame with three columns, 'Type', 'Lookup', and 'Cost', representing housing costs for each type.
     
     Prints a message if the request fails, including the status code of the response.
     """

@@ -1,0 +1,66 @@
+jobDataScrapeSEL module
+=======================
+
+jobDataScrapeSEL module
+jobDataScrapeSEL.dowload_job_salary_data(county)
+BLS is very strick with bot activity and automatic data scraping. It prevents using tools like raw Beautiful Soup to download files.
+
+To go around this, we are going to open an instance of Chrome using Selenium and simulate user activity in the page to download a file.
+
+jobDataScrapeSEL.file_to_df(path, county)
+Reads a file downloaded from the BLS website and processes it into a Polars DataFrame with 17 columns.
+
+Parameters
+pathstr
+The path to the file to read.
+
+Returns
+polars.DataFrame
+The processed DataFrame with 17 columns.
+
+Notes
+The function first reads the file into a DataFrame, then filters it to only include data from the specific County. It then reshapes the data from a single column of 17 values per job to a DataFrame with 17 columns. Finally, it creates a column of job IDs and assigns them to the DataFrame.
+
+All the commented out print statements are for debugging purposes.
+
+jobDataScrapeSEL.get_county_id(county)
+Given a county name, this function returns the corresponding ‘area_code’ value from the ‘oe.area’ file. This value is used to query the BLS API for data specific to the county.
+
+Parameters
+countystr
+The name of the county for which the ‘area_code’ needs to be retrieved.
+
+Returns
+str
+The ‘area_code’ value for the given county.
+
+jobDataScrapeSEL.get_education_requirements()
+Scrapes the Bureau of Labor Statistics (BLS) website to extract education and training requirements by occupation, and returns the data as a Polars DataFrame.
+
+The function uses Selenium to navigate to the BLS webpage and retrieve the HTML content. BeautifulSoup is then used to parse the page and find the relevant table containing education requirements. The table data is extracted, cleaned, and converted into a Polars DataFrame, with the last row and column removed as they contain non-essential information.
+
+Returns
+polars.DataFrame
+A DataFrame containing education and training requirements by occupation, with each column representing a different attribute.
+
+jobDataScrapeSEL.jobDataScrapeStarter(county)
+jobDataScrapeSEL.split_df(df, county)
+Given a DataFrame with job data, this function filters it to only include data from the specific County.
+
+Parameters
+dfpolars.DataFrame
+The DataFrame to filter.
+
+Not a parameter, but a global variable:
+
+county_idstr
+The ‘area_code’ value for the county of interest.
+
+Returns
+polars.DataFrame
+The filtered DataFrame containing only data from Racine County.
+
+.. automodule:: jobDataScrapeSEL
+   :members:
+   :undoc-members:
+   :show-inheritance:

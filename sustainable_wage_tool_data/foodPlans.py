@@ -203,7 +203,7 @@ def splitCostList1(numberList):
     
     Examples
     --------
-    >>> splitCostList1('$7.80\n$8.90')
+    >>> splitCostList1('$7.80\\n$8.90')
     <<< [7.8, 8.9]
     """
     values = numberList.replace('$', '').split('\n')
@@ -228,8 +228,8 @@ def splitGroupList1(groupList):
 
     Examples
     --------
-    >>> splitGroupList1('Individuals\nChild Header\nChild 1\nChild 2\n...') 
-    ['Child 1', 'Child 2', ...']
+    >>> splitGroupList1('Individuals\\nChild Header\\nChild 1\\nChild 2\\n...') 
+    <<<['Child 1', 'Child 2', ...']
     """
     values = groupList.split('\n')
         

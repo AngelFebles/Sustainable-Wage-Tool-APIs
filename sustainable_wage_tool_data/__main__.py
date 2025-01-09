@@ -2,6 +2,7 @@ import polars as pl
 import xlsxwriter
 
 import argparse
+import re
 
 from foodPlans import foodPlansmain
 from foodPlans import getAgeCohortMeans
@@ -64,10 +65,26 @@ def generate_county_data(county_name):
     #makes the other letters lowercase
     #The "du" expection is for the county "Fond du Lac", which needs du to be lowercase
     
-    #TODO: Refactor into a list of articles
-    #word boundries 
-    county_name = county_name.title().replace("Du", "du")
+    
+    articles = ['the', 't', 'e', 'u', 'l', 'ab', 'a', 'r', 'z', 'of', 'v', 'j', 'i', 'and', 'n', 'aa', 'g', 'm', 'y', 's', 'f', 'k', 'p', 'qui', 'h', 'x', 'du', 'd', 'q', 'w', 'o']
+    
+    words = county_name.split()
+    new_words = []
+    
+    for word in words:
+        if word.lower() in [article.lower() for article in articles]:
+            new_words.append(word.lower())
+        else:
+            new_words.append(word.title())
+    county_name = ' '.join(new_words)
+    
+    
 
+    #county_name = county_name.title().replace("Du", "du")
+    
+    
+    
+    
     """
     Fip codes are unique identifiers for states, counties, etc
 
@@ -88,7 +105,7 @@ def generate_county_data(county_name):
     counties_fips_df = pl.read_csv(counties_fips_path, separator="\t")
         
     # Find the FIPS code for the given county name
-    county_row = counties_fips_df.filter(pl.col("County Name") == county_name.capitalize())
+    county_row = counties_fips_df.filter(pl.col("County Name") == county_name)
     fips_code = county_row.select("FIPS Code").to_series().item()
     
     if not fips_code:
@@ -97,8 +114,8 @@ def generate_county_data(county_name):
     #We need to append 5 9s to the end of the FIPS code to lookup in the database
     county_code_housing_cost = f'{fips_code}99999'
       
-    county_self_sufficiency_standard = f'{county_name.capitalize()} County'
-    county_job_data = f'{county_name.capitalize()}, WI'
+    county_self_sufficiency_standard = f'{county_name} County'
+    county_job_data = f'{county_name}, WI'
     
     return county_code_housing_cost, county_self_sufficiency_standard, county_job_data
 
