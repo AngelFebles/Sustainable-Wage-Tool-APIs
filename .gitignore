@@ -1,17 +1,17 @@
-sustainable_wage_tool_data/scripts/credentials.py
+src/sustainable_wage_tool_data/scripts/credentials.py
 
 __pycache__
 
 tempCodeRunnerFile.py
 
-sustainable_wage_tool_data/DataFiles/*
-!sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data
+src/sustainable_wage_tool_data/DataFiles/*
+!src/sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data
 
 *dataOutput.xlsx*
 
 *jobData.xlsx*
 
-sustainable_wage_tool_data/scripts/__pycache__/*
+src/sustainable_wage_tool_data/scripts/__pycache__/*
 
 /build
 /dist

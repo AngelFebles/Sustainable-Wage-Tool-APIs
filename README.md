@@ -1,5 +1,8 @@
 This repository contains scripts that automatically retrieve information from the most recent sources for the Sustainable Wage Tool.
 
+Read the project's documentation [here](https://angelfebles.github.io/Sustainable-Wage-Tool-APIs/en/index.html).
+
+
 Sources:
 
 Housing Cost API: https://www.huduser.gov/portal/dataset/fmr-api.html
@@ -28,13 +31,13 @@ pip install -r requirements.txt
 This project uses argparse for county lookup. To initialize project, run from the command line in the root directory:
 
 ```
-python sustainable_wage_tool_data "county name"
+python src/sustainable_wage_tool_data "county name"
 ```
 
 Example: 
 
 ```
-python sustainable_wage_tool_data "racine"
+python src/sustainable_wage_tool_data "racine"
 ```
 
 

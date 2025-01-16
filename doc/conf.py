@@ -8,7 +8,7 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../sustainable_wage_tool_data'))
+sys.path.insert(0, os.path.abspath('scr/sustainable_wage_tool_data'))
 
 project = 'sustainable_wage_tool_data'
 copyright = '2025, Higher Expectations'
