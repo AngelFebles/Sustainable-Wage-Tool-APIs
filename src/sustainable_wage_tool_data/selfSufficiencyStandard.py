@@ -10,7 +10,7 @@ def sssMain(county_SelfSufficiencyStandard):
     Fetches the Self Sufficiency Standard data from the designated website for Wisconsin. 
     
     The function scrapes the website to find the most recent Self Sufficiency Standard file link,
-    downloads it if not already present in the './DataFiles' directory, and reads the file to extract data 
+    downloads it if not already present in the './DataFiles/' directory, and reads the file to extract data 
     specific to Racine County. The data is processed using the `readFile` function, which reads the file 
     into a Polars DataFrame.
 
@@ -37,11 +37,11 @@ def sssMain(county_SelfSufficiencyStandard):
     filename = os.path.basename(linkToSSS)
 
     # Create the directory if it doesn't exist
-    os.makedirs(r'sustainable_wage_tool_data\DataFiles', exist_ok=True)
+    os.makedirs(r'src\sustainable_wage_tool_data\DataFiles', exist_ok=True)
     
     
     #Check if we already have that file
-    file_path = os.path.join(r'sustainable_wage_tool_data\DataFiles', filename)
+    file_path = os.path.join(r'src\sustainable_wage_tool_data\DataFiles', filename)
 
     #If not, download it
     if not os.path.exists(file_path):

@@ -99,7 +99,7 @@ def generate_county_data(county_name):
     
     """
    
-    counties_fips_path = 'sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data'
+    counties_fips_path = 'src/sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data'
     
     # Read the file into a DataFrame
     counties_fips_df = pl.read_csv(counties_fips_path, separator="\t")
@@ -145,8 +145,7 @@ if __name__ == "__main__":
 
 
     #Filling the dataframes with the info from each script
-
-    with xlsxwriter.Workbook("dataOutput.xlsx") as workbook:
+    with xlsxwriter.Workbook(f"src\\sustainable_wage_tool_data\\DataFiles\\OutputFiles\\dataOutput.xlsx") as workbook:
         housing_cost_plan_df.write_excel(workbook=workbook,worksheet='Housing_lookup')
         self_sufficiency_standard_df.write_excel(workbook=workbook,worksheet='Self_Sufficiency_Standard')
         food_plans_df.write_excel(workbook=workbook,worksheet='Food_lookup')
@@ -157,3 +156,4 @@ if __name__ == "__main__":
 
     jobDataScrapeStarter(county_JobData)
     print("Done!")
+    print("Files are in src/sustainable_wage_tool_data/DataFiles/OutputFiles")

@@ -34,7 +34,7 @@ def get_county_id(county):
 
     """
     
-    job_data_files_dir = os.path.join(os.path.dirname(__file__), 'JobDataFiles/oe.area')
+    job_data_files_dir = os.path.join(os.path.dirname(__file__), 'DataFiles/oe.area')
     absolute_pathJD = os.path.abspath(job_data_files_dir)
     
        
@@ -66,9 +66,9 @@ def dowload_job_salary_data(county):
     
     
     # Since we are downloading throught Chrome, files would normaly go to whatever download path you currently have.
-    # The code below gets the absolute path of /DataFiles to change the download path there.
+    # The code below gets the absolute path of /DataFiles/OutputFiles to change the download path there.
     
-    raw_files_dir = os.path.join(os.path.dirname(__file__), '/DataFiles')
+    raw_files_dir = os.path.join(os.path.dirname(__file__), '/DataFiles/OutputFiles')
     absolute_path = os.path.abspath(raw_files_dir)
     prefs = {
     "download.default_directory": absolute_path,
@@ -338,8 +338,7 @@ def get_education_requirements():
 def jobDataScrapeStarter(county):
     job_data_df = pl.DataFrame(dowload_job_salary_data(county))
     educational_requirements_df = pl.DataFrame(get_education_requirements()) 
-
-    with xlsxwriter.Workbook("jobData.xlsx") as workbook:
+    with xlsxwriter.Workbook("src\sustainable_wage_tool_data\DataFiles\OutputFiles\jobData.xlsx") as workbook:
         job_data_df.write_excel(workbook=workbook,worksheet='Job_Data')
         educational_requirements_df.write_excel(workbook=workbook,worksheet='Education_Requirements')
     
