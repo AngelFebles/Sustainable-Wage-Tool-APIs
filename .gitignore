@@ -6,6 +6,7 @@ tempCodeRunnerFile.py
 
 src/sustainable_wage_tool_data/DataFiles/*
 !src/sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data
+!src/sustainable_wage_tool_data/DataFiles/oe.occupation
 
 *dataOutput.xlsx*
 

@@ -13,8 +13,8 @@ from jobDataScrapeSEL import jobDataScrapeStarter
 
 
 from credentials import APIKEYHOUSING
-#from scripts.employmentDataScrape import get_employement_data
 
+# from scripts.employmentDataScrape import get_employement_data
 
 
 """
@@ -46,9 +46,9 @@ Education_Requirements --- Educational requirements for each job
 # # https://dpi.wi.gov/sfs/statistical/basic-facts/wisconsin-counties
 # # So for example, Sauk County has has a FIPS code of 55111, so you would put 5511199999
 # # Racine has a FIPS code of 55101, so you would put 5510199999, etc
-# countyCode_HousingCost = '5510199999'  
+# countyCode_HousingCost = '5510199999'
 
-# # Make sure to put county name with the first letter beging a capital letter 
+# # Make sure to put county name with the first letter beging a capital letter
 # # Followed by the word "County" (wich also needs to have leading capital letter )
 # # For example: "Racine County", "Dodge County", "Eau Claire County"
 # county_SelfSufficiencyStandard = 'Racine County'
@@ -59,32 +59,59 @@ Education_Requirements --- Educational requirements for each job
 # #For example: "Racine, WI", "Dodge, WI", "Eau Claire, WI"
 # county_JobData = 'Racine, WI'
 
+
 def generate_county_data(county_name):
 
-    #This capitalizes the first letter of each word in the county name and 
-    #makes the other letters lowercase
-    #The "du" expection is for the county "Fond du Lac", which needs du to be lowercase
-    
-    
-    articles = ['the', 't', 'e', 'u', 'l', 'ab', 'a', 'r', 'z', 'of', 'v', 'j', 'i', 'and', 'n', 'aa', 'g', 'm', 'y', 's', 'f', 'k', 'p', 'qui', 'h', 'x', 'du', 'd', 'q', 'w', 'o']
-    
+    # This capitalizes the first letter of each word in the county name and
+    # makes the other letters lowercase
+    # The "du" expection is for the county "Fond du Lac", which needs du to be lowercase
+
+    articles = [
+        "the",
+        "t",
+        "e",
+        "u",
+        "l",
+        "ab",
+        "a",
+        "r",
+        "z",
+        "of",
+        "v",
+        "j",
+        "i",
+        "and",
+        "n",
+        "aa",
+        "g",
+        "m",
+        "y",
+        "s",
+        "f",
+        "k",
+        "p",
+        "qui",
+        "h",
+        "x",
+        "du",
+        "d",
+        "q",
+        "w",
+        "o",
+    ]
+
     words = county_name.split()
     new_words = []
-    
+
     for word in words:
         if word.lower() in [article.lower() for article in articles]:
             new_words.append(word.lower())
         else:
             new_words.append(word.title())
-    county_name = ' '.join(new_words)
-    
-    
+    county_name = " ".join(new_words)
 
-    #county_name = county_name.title().replace("Du", "du")
-    
-    
-    
-    
+    # county_name = county_name.title().replace("Du", "du")
+
     """
     Fip codes are unique identifiers for states, counties, etc
 
@@ -98,61 +125,71 @@ def generate_county_data(county_name):
     Got these from here: https://dpi.wi.gov/sfs/statistical/basic-facts/wisconsin-counties
     
     """
-   
-    counties_fips_path = 'src/sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data'
-    
+
+    counties_fips_path = (
+        "src/sustainable_wage_tool_data/DataFiles/countiesFIPSCodes.data"
+    )
+
     # Read the file into a DataFrame
     counties_fips_df = pl.read_csv(counties_fips_path, separator="\t")
-        
+
     # Find the FIPS code for the given county name
     county_row = counties_fips_df.filter(pl.col("County Name") == county_name)
     fips_code = county_row.select("FIPS Code").to_series().item()
-    
+
     if not fips_code:
         raise ValueError("County not found")
-    
-    #We need to append 5 9s to the end of the FIPS code to lookup in the database
-    county_code_housing_cost = f'{fips_code}99999'
-      
-    county_self_sufficiency_standard = f'{county_name} County'
-    county_job_data = f'{county_name}, WI'
-    
+
+    # We need to append 5 9s to the end of the FIPS code to lookup in the database
+    county_code_housing_cost = f"{fips_code}99999"
+
+    county_self_sufficiency_standard = f"{county_name} County"
+    county_job_data = f"{county_name}, WI"
+
     return county_code_housing_cost, county_self_sufficiency_standard, county_job_data
 
 
-#TODO: Improve comparison of strings for county names. Use "Regular Expressions"
+# TODO: Improve comparison of strings for county names. Use "Regular Expressions"
 
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description="Process county name for data extraction.")
-    parser.add_argument('county_name', type=str, help='Name of the county to process')
+    parser = argparse.ArgumentParser(
+        description="Process county name for data extraction."
+    )
+    parser.add_argument("county_name", type=str, help="Name of the county to process")
     args = parser.parse_args()
 
-    countyCode_HousingCost, county_SelfSufficiencyStandard, county_JobData = generate_county_data(args.county_name)
+    countyCode_HousingCost, county_SelfSufficiencyStandard, county_JobData = (
+        generate_county_data(args.county_name)
+    )
 
+    # Creating dataframes for each sheet
 
-
-    #Creating dataframes for each sheet
-
-    housing_cost_plan_df = pl.DataFrame(housingCostMain(countyCode_HousingCost, APIKEYHOUSING))
+    housing_cost_plan_df = pl.DataFrame(
+        housingCostMain(countyCode_HousingCost, APIKEYHOUSING)
+    )
     food_plans_df = pl.DataFrame(foodPlansmain())
     food_plans_means_df = pl.DataFrame(getAgeCohortMeans(food_plans_df))
     self_sufficiency_standard_df = pl.DataFrame(sssMain(county_SelfSufficiencyStandard))
-    monthly_budget_df = pl.DataFrame(monthlyBudgetMain(self_sufficiency_standard_df,housing_cost_plan_df))
+    monthly_budget_df = pl.DataFrame(
+        monthlyBudgetMain(self_sufficiency_standard_df, housing_cost_plan_df)
+    )
 
-    #thrifthydf.write_excel(workbook="polars_simple.xlsx", worksheet='foodPlansA')
+    # thrifthydf.write_excel(workbook="polars_simple.xlsx", worksheet='foodPlansA')
 
-
-    #Filling the dataframes with the info from each script
-    with xlsxwriter.Workbook(f"src\\sustainable_wage_tool_data\\DataFiles\\OutputFiles\\dataOutput.xlsx") as workbook:
-        housing_cost_plan_df.write_excel(workbook=workbook,worksheet='Housing_lookup')
-        self_sufficiency_standard_df.write_excel(workbook=workbook,worksheet='Self_Sufficiency_Standard')
-        food_plans_df.write_excel(workbook=workbook,worksheet='Food_lookup')
-        food_plans_means_df.write_excel(workbook=workbook,worksheet='Food_means')    
-        #jobs_data_df.write_excel(workbook=workbook,worksheet='Jobs')
-        monthly_budget_df.write_excel(workbook=workbook,worksheet='Monthly Budget')
-        
+    # Filling the dataframes with the info from each script
+    with xlsxwriter.Workbook(
+        f"src\\sustainable_wage_tool_data\\DataFiles\\OutputFiles\\dataOutput.xlsx"
+    ) as workbook:
+        housing_cost_plan_df.write_excel(workbook=workbook, worksheet="Housing_lookup")
+        self_sufficiency_standard_df.write_excel(
+            workbook=workbook, worksheet="Self_Sufficiency_Standard"
+        )
+        food_plans_df.write_excel(workbook=workbook, worksheet="Food_lookup")
+        food_plans_means_df.write_excel(workbook=workbook, worksheet="Food_means")
+        # jobs_data_df.write_excel(workbook=workbook,worksheet='Jobs')
+        monthly_budget_df.write_excel(workbook=workbook, worksheet="Monthly Budget")
 
     jobDataScrapeStarter(county_JobData)
     print("Done!")
