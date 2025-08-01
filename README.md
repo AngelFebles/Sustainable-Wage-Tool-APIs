@@ -57,3 +57,12 @@ Upon execution, project will output two files:
 
     Job_Data --- Misc data for each job (annual wage, hourly wage, number of jobs available, ...)\
     Education_Requirements --- Educational requirements for each job
+
+
+The output of this code is fed into [this project](https://github.com/AngelFebles/sss_graph) which creates an interactive graph for the data in a static website.
+
+Example graph for Racine County, WI March 2025. 
+
+<img width="1897" height="809" alt="swt_graph" src="https://github.com/user-attachments/assets/71929ef3-ab1e-4267-8802-376155e7fce3" />
+
+
