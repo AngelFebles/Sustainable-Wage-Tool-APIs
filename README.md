@@ -61,7 +61,7 @@ Upon execution, project will output two files:
 
 The output of this code is fed into [this project](https://github.com/AngelFebles/sss_graph) which creates an interactive graph for the data in a static website.
 
-Example graph for Racine County, WI March 2025. 
+Example graph for Racine County, WI March 2025. [Click Here for Live Demo.](https://angelfebles.github.io/sss_graph/)
 
 <img width="1897" height="809" alt="swt_graph" src="https://github.com/user-attachments/assets/71929ef3-ab1e-4267-8802-376155e7fce3" />
 
